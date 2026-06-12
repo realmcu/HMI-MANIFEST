@@ -1,0 +1,46 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+
+      - name: github
+        url-base: https://github.com      
+
+      - name: gitee
+        url-base: https://gitee.com           
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: honeycomb
+        repo-path: HoneyComb
+        revision: release/crb-3.14.0
+        path: honeycomb
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl8773e-eBadge
+        path: honeycomb/sdk/board/evb/eBadge
+        west-commands: west_commands_extention/west-commands.yml
+
+      - name: rtl87x3-eBadge
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x3-eBadge
+        path: honeycomb/sdk/board/evb/eBadge/src/transport
+
+      - name: ui
+        remote: github                         
+        repo-path: realmcu/honeygui-template-EBadge 
+        revision: main                         
+        path: honeycomb/sdk/board/evb/eBadge/app/designer 
+        
+      - name: FlashDB
+        remote: gitee                         
+        repo-path: RealMCU/FlashDB 
+        revision: master                         
+        path: honeycomb/sdk/board/evb/eBadge/app/FlashDB 
+
+    self:
+        path: .manifest

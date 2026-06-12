@@ -1,0 +1,23 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: honeycomb
+        repo-path: HoneyComb
+        revision: release/crb-3.14.0
+        path: honeycomb
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl8773e-dashboard
+        path: honeycomb/sdk/board/evb/hmi_dashboard
+        west-commands: west_commands_extention/west-commands.yml
+
+    self:
+        path: .manifest
