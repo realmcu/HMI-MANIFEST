@@ -25,22 +25,22 @@ manifest:
         path: honeycomb/sdk/board/evb/eBadge
         west-commands: west_commands_extention/west-commands.yml
 
-      - name: rtl87x3-eBadge
-        repo-path: HoneyRepo/hmi
-        revision: rtl87x3-eBadge
-        path: honeycomb/sdk/board/evb/eBadge/src/transport
-
       - name: ui
         remote: github                         
         repo-path: realmcu/honeygui-template-EBadge 
         revision: main                         
         path: honeycomb/sdk/board/evb/eBadge/app/designer 
         
+      - name: rtl87x3-hmi-protocol
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x3-hmi-protocol
+        path: honeycomb/sdk/board/evb/eBadge/component/protocol
+ 
       - name: FlashDB
-        remote: gitee                         
-        repo-path: RealMCU/FlashDB 
-        revision: master                         
-        path: honeycomb/sdk/board/evb/eBadge/app/FlashDB 
+        remote: gitee   
+        repo-path: RealMCU/FlashDB
+        revision: master
+        path: honeycomb/sdk/board/evb/eBadge/component/FlashDB
 
     self:
         path: .manifest
