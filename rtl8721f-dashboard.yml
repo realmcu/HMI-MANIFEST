@@ -14,11 +14,6 @@ manifest:
         repo-path: ameba-aiot/ameba-rtos
         revision: master
         path: ameba-rtos
-        submodules:
-          - path: component/audio
-          - path: component/ui
-          - path: component/aivoice
-          - path: component/tflite_micro
 
       - name: hmi
         repo-path: HoneyRepo/hmi
