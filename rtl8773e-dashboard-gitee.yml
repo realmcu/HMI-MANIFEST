@@ -14,7 +14,7 @@ manifest:
         path: sdk
 
       - name: hmi-dashboard
-        repo-path: realmcu/rtl87x3ep-mcu-hmi-app
+        repo-path: realmcu/hmi
         revision: rtl8773e-dashboard
         path: sdk/board/evb/hmi_dashboard
         west-commands: west_commands_extention/west-commands.yml
