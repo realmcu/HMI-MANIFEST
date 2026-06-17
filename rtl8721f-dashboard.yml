@@ -14,6 +14,7 @@ manifest:
         repo-path: ameba-aiot/ameba-rtos
         revision: master
         path: ameba-rtos
+        submodules: true
 
       - name: hmi
         repo-path: HoneyRepo/hmi

@@ -12,6 +12,7 @@ manifest:
         repo-path: realmcu/ameba-rtos
         revision: release/v1.2
         path: ameba-rtos
+        submodules: true
           
       - name: bluetooth_ext
         repo-path: realmcu/bluetooth_ext
