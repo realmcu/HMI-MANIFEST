@@ -1,0 +1,36 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: https://gitee.com
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: ameba-rtos
+        repo-path: realmcu/ameba-rtos
+        revision: release/v1.2
+        path: ameba-rtos
+        submodules:
+          - path: component/audio
+          - path: component/ui
+          - path: component/aivoice
+          - path: component/tflite_micro
+          
+      - name: bluetooth_ext
+        repo-path: realmcu/bluetooth_ext
+        revision: master
+        path: ameba-rtos/component/bluetooth_ext
+
+      - name: hmi
+        repo-path: realmcu/hmi
+        revision: rtl8721f-dashboard
+        path: ameba-rtos/component/ui/HoneyGUI
+
+      - name: honeygui
+        revision: master
+        repo-path: realmcu/HoneyGUI
+        path: ameba-rtos/component/ui/HoneyGUI/honeygui
+
+
