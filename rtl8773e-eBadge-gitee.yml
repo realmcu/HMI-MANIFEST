@@ -1,0 +1,46 @@
+manifest:
+ 
+    remotes:
+      - name: github
+        url-base: https://github.com
+ 
+      - name: gitee
+        url-base: https://gitee.com
+ 
+    defaults:
+      remote: gitee
+ 
+    projects:
+      - name: rtl87x3ep-mcu-hmi-sdk
+        repo-path: realmcu/rtl87x3ep-mcu-hmi-sdk
+        path: RTL8773EP
+ 
+      - name: hmi
+        repo-path: realmcu/hmi
+        revision: rtl8773e-eBadge
+        path: RTL8773EP/board/evb/eBadge
+ 
+      - name: rtl87x3-hmi-protocol
+        repo-path: realmcu/hmi
+        revision: rtl87x3-hmi-protocol
+        path: RTL8773EP/board/evb/eBadge/component/protocol
+ 
+      - name: FlashDB
+        remote: gitee
+        repo-path: RealMCU/FlashDB
+        revision: master
+        path: RTL8773EP/board/evb/eBadge/component/FlashDB
+ 
+      - name: Wearable
+        repo-path: realmcu/wearable
+        revision: master
+        path: RTL8773EP/src/app/Wearable/
+ 
+      - name: ui
+        remote: github
+        repo-path: realmcu/honeygui-template-EBadge
+        revision: main
+        path: RTL8773EP/board/evb/eBadge/app/designer
+ 
+    self:
+        path: .manifest

@@ -1,0 +1,39 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: https://gitee.com
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: rtl87x3ep-hmi-sdk
+        repo-path: realmcu/rtl87x3ep-hmi-sdk
+        revision: master
+        path: sdk
+
+      - name: hmi-dashboard
+        repo-path: realmcu/rtl87x3ep-mcu-hmi-app
+        revision: rtl8773e-dashboard
+        path: sdk/board/evb/hmi_dashboard
+        west-commands: west_commands_extention/west-commands.yml
+
+      - name: wearable
+        repo-path: realmcu/wearable
+        revision: master
+        path: sdk/src/app/Wearable
+
+      - name: HoneyGUI
+        repo-path: realmcu/HoneyGUI
+        revision: master
+        path: sdk/src/sample/gui
+
+      - name: display
+        repo-path: realmcu/display
+        revision: master
+        path: sdk/src/mcu/display
+
+    self:
+        path: .manifest
+
