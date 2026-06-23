@@ -44,8 +44,8 @@ manifest:
 
       - name: hmi
         repo-path: HoneyRepo/hmi
-        revision: rtl8783gbf-eBadge
-        path: zephyrproject/realtek-app/applications/eBadge
+        revision: rtl87x3g-zephyr-simple-test
+        path: zephyrproject/realtek-app/applications/simple-test
         west-commands: west_commands_extention/west-commands.yml
 
       - name: rtl87x3-hmi-protocol
@@ -53,6 +53,10 @@ manifest:
         revision: rtl87x3-hmi-protocol
         path: zephyrproject/realtek-app/applications/eBadge/component/protocol
 
+      - name: rtl87x3-hmi-posix
+        repo-path: HoneyRepo/hmi
+        revision: posix-device
+        path: zephyrproject/realtek-app/applications/eBadge/component/posix
 
       - name: FlashDB
         remote: gitee
