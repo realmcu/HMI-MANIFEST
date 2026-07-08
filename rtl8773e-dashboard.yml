@@ -3,6 +3,10 @@ manifest:
     remotes:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
+      - name: gitee
+        url-base: https://gitee.com
+      - name: github
+        url-base: https://github.com
 
     defaults:
       remote: origin
@@ -18,6 +22,12 @@ manifest:
         revision: rtl8773e-dashboard
         path: honeycomb/sdk/board/evb/hmi_dashboard
         west-commands: west_commands_extention/west-commands.yml
+
+      - name: ui
+        remote: github
+        repo-path: realmcu/honeygui-template-dashboard
+        revision: dev_lite
+        path: honeycomb/sdk/board/evb/hmi_dashboard/src/application/designer
 
     self:
         path: .manifest
