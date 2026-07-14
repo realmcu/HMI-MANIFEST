@@ -5,6 +5,10 @@ manifest:
         url-base: ssh://cn4soc.rtkbf.com:29418
       - name: gitee
         url-base: https://gitee.com
+      - name: upstream
+        url-base: https://github.com/zephyrproject-rtos
+      - name: arm-software
+        url-base: https://github.com/ARM-software
 
     defaults:
       remote: origin
@@ -57,6 +61,18 @@ manifest:
         repo-path: RealMCU/FlashDB
         revision: master
         path: zephyrproject/realtek-app/applications/simple-test/component/FlashDB
+
+      - name: tflite-micro
+        remote: upstream
+        repo-path: tflite-micro
+        revision: zephyr_20240627
+        path: zephyrproject/realtek-app/applications/simple-test/component/tflite-micro
+
+      - name: CMSIS-NN
+        remote: arm-software
+        repo-path: CMSIS-NN
+        revision: v6.0.0
+        path: zephyrproject/realtek-app/applications/simple-test/component/cmsis-nn
 
 
     self:
