@@ -47,31 +47,31 @@ manifest:
       - name: hmi
         repo-path: HoneyRepo/hmi
         revision: rtl8773g-eBadge
-        path: zephyrproject/realtek-app/applications/eBadge
+        path: zephyrproject/realtek-app/applications/eBadge_8773g
         west-commands: west_commands_extention/west-commands.yml
 
       - name: ui
         remote: github                         
         repo-path: realmcu/honeygui-template-EBadge 
         revision: main                         
-        path: zephyrproject/realtek-app/applications/eBadge/app/designer
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/app/designer
 
       - name: rtl87x3-hmi-protocol
         repo-path: HoneyRepo/hmi
         revision: rtl87x3-hmi-protocol
-        path: zephyrproject/realtek-app/applications/eBadge/component/protocol
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/protocol
 
 
       - name: FlashDB
         remote: gitee
         repo-path: RealMCU/FlashDB
         revision: master
-        path: zephyrproject/realtek-app/applications/eBadge/component/FlashDB
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/FlashDB
 
-      # - name: poxis-device
-      #   url: git@gitee.com:realmcu_admin/posix-device
-      #   revision: master
-      #   path: zephyrproject/realtek-app/applications/eBadge/posix-device
+      - name: poxis-device
+        repo-path: HoneyRepo/hmi
+        revision: posix-device
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/posix-device
 
 
     self:
