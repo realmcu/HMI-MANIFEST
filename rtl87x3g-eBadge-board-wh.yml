@@ -48,7 +48,7 @@ manifest:
 
       - name: hmi
         repo-path: HoneyRepo/hmi
-        revision: rtl87x3g-zephyr-simple-test
+        revision: rtl8773g-eBadge-dev
         path: zephyrproject/realtek-app/applications/simple-test
 
       - name: rtl87x3-hmi-posix
