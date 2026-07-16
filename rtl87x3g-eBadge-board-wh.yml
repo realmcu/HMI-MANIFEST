@@ -1,0 +1,79 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+      - name: gitee
+        url-base: https://gitee.com
+      - name: upstream
+        url-base: https://github.com/zephyrproject-rtos
+      - name: arm-software
+        url-base: https://github.com/ARM-software
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: zephyr
+        repo-path: HoneyRepo/zephyr
+        revision: realtek-main-v3.7
+        path: zephyr
+        import:
+            path-prefix: zephyrproject
+            name-allowlist:
+              - cmsis
+              - tinycrypt
+              - mbedtls
+              - fatfs
+
+      - name: hal_realtek
+        repo-path: HoneyRepo/zephyr-hal
+        revision: master
+        path: zephyrproject/modules/hal/realtek
+
+      - name: realtek-app
+        repo-path: HoneyRepo/realtek-zephyr-project
+        revision: master
+        path: zephyrproject/realtek-app
+
+      - name: display
+        repo-path: HoneyRepo/driver/display
+        revision: master
+        path: zephyrproject/modules/display
+
+      - name: honeygui
+        repo-path: HoneyGUI
+        revision: master
+        path: zephyrproject/modules/honeygui
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x3g-zephyr-simple-test
+        path: zephyrproject/realtek-app/applications/simple-test
+
+      - name: rtl87x3-hmi-posix
+        repo-path: HoneyRepo/hmi
+        revision: posix-device
+        path: zephyrproject/realtek-app/applications/simple-test/component/posix
+
+      - name: FlashDB
+        remote: gitee
+        repo-path: RealMCU/FlashDB
+        revision: master
+        path: zephyrproject/realtek-app/applications/simple-test/component/FlashDB
+
+      - name: tflite-micro
+        remote: upstream
+        repo-path: tflite-micro
+        revision: zephyr_20240627
+        path: zephyrproject/realtek-app/applications/simple-test/component/tflite-micro
+
+      - name: CMSIS-NN
+        remote: arm-software
+        repo-path: CMSIS-NN
+        revision: v6.0.0
+        path: zephyrproject/realtek-app/applications/simple-test/component/cmsis-nn
+
+
+    self:
+        path: .manifest
