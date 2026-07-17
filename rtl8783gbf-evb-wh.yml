@@ -46,27 +46,27 @@ manifest:
 
       - name: hmi
         repo-path: HoneyRepo/hmi
-        revision: rtl8783gbf-eBadge
-        path: zephyrproject/realtek-app/applications/eBadge
+        revision: RTL8783GBF-EVB-WH
+        path: zephyrproject/realtek-app/applications/hmi
         west-commands: west_commands_extention/west-commands.yml
 
       - name: ui
         remote: github                         
         repo-path: realmcu/honeygui-template-EBadge 
         revision: main                         
-        path: zephyrproject/realtek-app/applications/eBadge/app/designer 
+        path: zephyrproject/realtek-app/applications/hmi/app/designer 
 
       - name: rtl87x3-hmi-protocol
         repo-path: HoneyRepo/hmi
         revision: rtl87x3-hmi-protocol
-        path: zephyrproject/realtek-app/applications/eBadge/component/protocol
+        path: zephyrproject/realtek-app/applications/hmi/component/protocol
 
 
       - name: FlashDB
         remote: gitee
         repo-path: RealMCU/FlashDB
         revision: master
-        path: zephyrproject/realtek-app/applications/eBadge/component/FlashDB
+        path: zephyrproject/realtek-app/applications/hmi/component/FlashDB
 
 
     self:
