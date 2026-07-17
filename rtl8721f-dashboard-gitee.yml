@@ -10,28 +10,28 @@ manifest:
     projects:
       - name: ameba-rtos
         repo-path: realmcu/ameba-rtos
-        revision: release/v1.2
+        revision: 862c78589ac746750a6ce9f79f5ebc7965edc9e0
         path: ameba-rtos
         submodules: true
-          
+
       - name: bluetooth_ext
         repo-path: realmcu/bluetooth_ext
-        revision: master
+        revision: c63b50bd34c992d8bedf0ce1dd4feecc2af5486b
         path: ameba-rtos/component/bluetooth_ext
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: rtl8721f-dashboard
+        revision: 1d6adab3326f30f58ce58e76e0c7eba8a5c3d349
         path: ameba-rtos/component/ui/HoneyGUI
 
       - name: honeygui
-        revision: master
+        revision: 64f8b819a178709640c28443a3dde1c0c6944a4d
         repo-path: realmcu/HoneyGUI
         path: ameba-rtos/component/ui/HoneyGUI/honeygui
 
       - name: honeygui-dashboard-ui
         repo-path: realmcu/honeygui-template-dashboard
-        revision: dev_without_a8
+        revision: 570785ec922826f9792454ced8050f377fb973ad
         path: ameba-rtos/component/ui/HoneyGUI/app/dashboard/ui_design
 
 
