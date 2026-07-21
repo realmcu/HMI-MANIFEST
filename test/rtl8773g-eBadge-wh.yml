@@ -5,6 +5,8 @@ manifest:
         url-base: ssh://cn4soc.rtkbf.com:29418
       - name: gitee
         url-base: https://gitee.com
+      - name: gitee-ssh
+        url-base: git@gitee.com:
       - name: upstream
         url-base: https://github.com/zephyrproject-rtos
       - name: arm-software
@@ -73,6 +75,12 @@ manifest:
         repo-path: CMSIS-NN
         revision: v6.0.0
         path: applications/component/cmsis-nn
+
+      - name: gsensor-algorithm
+        remote: gitee-ssh
+        repo-path: realmcu_admin/gsensor-algorithm
+        revision: master
+        path: applications/component/gsensor-algorithm
 
 
     self:
