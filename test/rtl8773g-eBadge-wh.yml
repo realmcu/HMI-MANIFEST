@@ -49,30 +49,30 @@ manifest:
       - name: hmi
         repo-path: HoneyRepo/hmi
         revision: RTL8773G-eBadge-WH
-        path: zephyrproject/realtek-app/applications/wh-eBadge-dev
+        path: applications
 
       - name: rtl87x3-hmi-posix
         repo-path: HoneyRepo/hmi
         revision: posix-device
-        path: zephyrproject/realtek-app/applications/simple-test/component/posix
+        path: applications/component/posix
 
       - name: FlashDB
         remote: gitee
         repo-path: RealMCU/FlashDB
         revision: master
-        path: zephyrproject/realtek-app/applications/simple-test/component/FlashDB
+        path: applications/component/FlashDB
 
       - name: tflite-micro
         remote: upstream
         repo-path: tflite-micro
         revision: zephyr_20240627
-        path: zephyrproject/realtek-app/applications/simple-test/component/tflite-micro
+        path: applications/component/tflite-micro
 
       - name: CMSIS-NN
         remote: arm-software
         repo-path: CMSIS-NN
         revision: v6.0.0
-        path: zephyrproject/realtek-app/applications/simple-test/component/cmsis-nn
+        path: applications/component/cmsis-nn
 
 
     self:
