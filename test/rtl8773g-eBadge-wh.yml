@@ -6,7 +6,7 @@ manifest:
       - name: gitee
         url-base: https://gitee.com
       - name: gitee-ssh
-        url-base: git@gitee.com:
+        url-base: ssh://git@gitee.com
       - name: upstream
         url-base: https://github.com/zephyrproject-rtos
       - name: arm-software
