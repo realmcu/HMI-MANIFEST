@@ -4,9 +4,9 @@ manifest:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
       - name: gitee
-        url-base: https://gitee.com
+        url-base: ssh://git@gitee.com
       - name: github
-        url-base: https://github.com  
+        url-base: ssh://git@github.com
 
     defaults:
       remote: origin
