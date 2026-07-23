@@ -21,7 +21,7 @@ manifest:
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: 1d6adab3326f30f58ce58e76e0c7eba8a5c3d349
+        revision: 45bcd8d424ef57942c43d886719b9ae0fc0311ca
         path: ameba-rtos/component/ui/HoneyGUI
 
       - name: honeygui
