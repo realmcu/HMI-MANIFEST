@@ -53,6 +53,11 @@ manifest:
         revision: RTL8773G-eBadge-WH
         path: applications
 
+      - name: hmi-script
+        repo-path: HoneyRepo/hmi
+        revision: script
+        path: applications/scripts
+
       - name: rtl87x3-hmi-posix
         repo-path: HoneyRepo/hmi
         revision: posix-device

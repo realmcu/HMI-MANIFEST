@@ -50,6 +50,11 @@ manifest:
         path: applications
         west-commands: west_commands_extention/west-commands.yml
 
+      - name: hmi-script
+        repo-path: HoneyRepo/hmi
+        revision: script
+        path: applications/scripts
+
       - name: rtl87x3-hmi-protocol
         repo-path: HoneyRepo/hmi
         revision: rtl87x3-hmi-protocol
