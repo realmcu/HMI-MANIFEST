@@ -1,0 +1,92 @@
+name: Nightly release verification
+
+on:
+  schedule:
+    # 03:03 Asia/Shanghai (UTC+8)
+    - cron: "3 19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-release-verification
+  cancel-in-progress: false
+
+jobs:
+  dashboard:
+    name: Dashboard GCC full build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
+    env:
+      WORKSPACE_DIR: ${{ github.workspace }}
+      REPORT_DIR: ${{ github.workspace }}/reports
+
+    steps:
+      - name: Checkout manifest
+        uses: actions/checkout@v4
+        with:
+          path: .manifest
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            cmake \
+            gcc-arm-none-eabi \
+            libnewlib-arm-none-eabi \
+            libstdc++-arm-none-eabi-newlib \
+            ninja-build
+          python -m pip install --disable-pip-version-check \
+            kconfiglib \
+            west==1.2.0
+
+      - name: Initialize release workspace
+        run: |
+          west init \
+            -l "${GITHUB_WORKSPACE}/.manifest" \
+            --mf rtl8773e-dashboard-gitee.yml
+          west update -n
+
+      - name: Record manifest revisions
+        working-directory: ${{ env.WORKSPACE_DIR }}
+        run: west manifest --freeze > "${GITHUB_WORKSPACE}/manifest-revisions.yml"
+
+      - name: Restore release tool permissions
+        run: |
+          chmod +x \
+            "${WORKSPACE_DIR}/sdk/tool/Gadgets/gcc_tool_linux/Hex2Bin" \
+            "${WORKSPACE_DIR}/sdk/tool/Gadgets/gcc_tool_linux/prepend_header" \
+            "${WORKSPACE_DIR}/sdk/tool/Gadgets/gcc_tool_linux/build_debug_table" \
+            "${WORKSPACE_DIR}/sdk/tool/Gadgets/version_generation/GitGenerateVersion.sh"
+          git -C "${WORKSPACE_DIR}/sdk" config core.fileMode false
+
+      - name: Run project verification
+        run: |
+          python "${GITHUB_WORKSPACE}/.manifest/scripts/verify_dashboard.py" \
+            --gitee "${WORKSPACE_DIR}" \
+            --profile full \
+            --jobs "$(nproc)" \
+            --report-dir "${REPORT_DIR}"
+
+      - name: Add result to job summary
+        if: always()
+        run: |
+          summary="$(find "${REPORT_DIR}" -name summary.md -type f -print -quit 2>/dev/null || true)"
+          if [ -n "${summary}" ]; then
+            cat "${summary}" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "Project verification did not produce a summary." >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: Upload verification reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-release-verification-${{ github.run_id }}
+          path: |
+            reports/
+            manifest-revisions.yml
+          if-no-files-found: warn
+          retention-days: 30
