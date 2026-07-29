@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""在现有本地 workspace 中验证 RTL8773E Dashboard GCC 构建。"""
+"""Verify RTL8773E Dashboard GCC builds in existing local workspaces."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ REQUIRED_TOOLS = ("git", "west", "cmake", "ninja", "arm-none-eabi-gcc")
 
 
 class VerificationError(RuntimeError):
-    """验证配置、环境或安全条件不满足。"""
+    """Verification configuration, environment, or safety requirements are unmet."""
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ def run_command(
     cwd: Path | None = None,
     stream: bool = False,
 ) -> CommandResult:
-    """执行命令并捕获输出；stream=True 时同步输出到终端。"""
+    """Run a command and capture output, streaming it when stream=True."""
     process = subprocess.Popen(
         list(command),
         cwd=str(cwd) if cwd else None,
@@ -100,7 +100,7 @@ def run_command(
     lines: list[str] = []
     if process.stdout is None:
         process.kill()
-        raise VerificationError(f"无法捕获命令输出：{' '.join(command)}")
+        raise VerificationError(f"Unable to capture command output: {' '.join(command)}")
     for line in process.stdout:
         lines.append(line)
         if stream:
@@ -112,12 +112,13 @@ def run_command(
 def discover_workspace(root: Path, name: str = "workspace") -> WorkspaceLayout:
     root = root.expanduser().resolve()
     if not (root / ".west").is_dir():
-        raise VerificationError(f"不是 West workspace（缺少 .west）：{root}")
+        raise VerificationError(f"Not a West workspace (.west is missing): {root}")
 
     markers = list(root.glob("**/board/evb/hmi_dashboard/west_commands_extention/west-commands.yml"))
     if len(markers) != 1:
         raise VerificationError(
-            f"无法唯一定位 Dashboard project：{root}（找到 {len(markers)} 个）"
+            f"Unable to uniquely locate the Dashboard project in {root} "
+            f"({len(markers)} found)"
         )
 
     dashboard_root = markers[0].parent.parent
@@ -135,11 +136,12 @@ def inspect_repository(
     name: str,
     nested_projects: Sequence[Path] = (),
 ) -> RepositoryStatus:
-    """读取仓库状态，并忽略由 West 管理的嵌套 project 根目录。
+    """Read repository status while ignoring nested West project roots.
 
-    Dashboard 仓库中的 Designer UI 是独立 West project。Git 会把这个嵌套仓库
-    显示为父仓库的 untracked 目录；它应由自己的 repository status 单独检查，
-    不能让干净的 West workspace 被误判为 dirty。
+    The Designer UI inside the Dashboard repository is a separate West project.
+    Git reports this nested repository as an untracked directory in its parent;
+    its status must be checked separately without marking a clean West workspace
+    as dirty.
     """
     raw_status = _git_value(path, "status", "--porcelain")
     ignored = set()
@@ -175,7 +177,7 @@ def list_west_projects(layout: WorkspaceLayout) -> list[RepositoryStatus]:
         ["west", "list", "-f", f"{{name}}{separator}{{abspath}}"], cwd=layout.root
     )
     if result.returncode != 0:
-        raise VerificationError(f"west list 失败：\n{result.stdout}")
+        raise VerificationError(f"west list failed:\n{result.stdout}")
 
     project_entries: list[tuple[str, Path]] = []
     for line in result.stdout.splitlines():
@@ -184,7 +186,7 @@ def list_west_projects(layout: WorkspaceLayout) -> list[RepositoryStatus]:
         try:
             name, path_text = line.split(separator, 1)
         except ValueError as exc:
-            raise VerificationError(f"无法解析 west list 输出：{line}") from exc
+            raise VerificationError(f"Unable to parse west list output: {line}") from exc
         project_entries.append((name, Path(path_text)))
 
     project_paths = [path for _name, path in project_entries]
@@ -203,8 +205,8 @@ def ensure_clean(repositories: Iterable[RepositoryStatus], allow_dirty: bool) ->
     if dirty and not allow_dirty:
         details = "\n".join(f"  - {item.name}: {item.path}" for item in dirty)
         raise VerificationError(
-            "检测到未提交修改，未开始构建。请先处理工作树，或显式传入 "
-            f"--allow-dirty：\n{details}"
+            "Uncommitted changes detected; builds were not started. Clean the "
+            f"working trees or explicitly pass --allow-dirty:\n{details}"
         )
 
 
@@ -212,7 +214,7 @@ def check_tools(include_guilib: bool) -> dict[str, str]:
     tools = list(REQUIRED_TOOLS)
     if include_guilib:
         if os.name != "nt":
-            raise VerificationError("west guilib 仅支持 Windows 原生环境")
+            raise VerificationError("west guilib only supports native Windows environments")
         tools.append("armclang")
 
     versions: dict[str, str] = {"platform": platform.platform()}
@@ -227,7 +229,7 @@ def check_tools(include_guilib: bool) -> dict[str, str]:
         versions[tool] = first_line
 
     if missing:
-        raise VerificationError(f"缺少必需工具：{', '.join(missing)}")
+        raise VerificationError(f"Required tools are missing: {', '.join(missing)}")
     return versions
 
 
@@ -251,10 +253,12 @@ def inspect_artifacts(sdk_root: Path, mode: str) -> ArtifactResult:
     mp_bin = mp_candidates[-1] if mp_candidates else None
 
     if not elf.is_file() or elf.stat().st_size == 0:
-        return ArtifactResult(False, output_dir, None, mp_bin, f"ELF 不存在或为空：{elf}")
+        return ArtifactResult(False, output_dir, None, mp_bin, f"ELF is missing or empty: {elf}")
     if mp_bin is None or mp_bin.stat().st_size == 0:
-        return ArtifactResult(False, output_dir, elf, None, f"MP bin 不存在或为空：{output_dir}")
-    return ArtifactResult(True, output_dir, elf, mp_bin, "关键产物检查通过")
+        return ArtifactResult(
+            False, output_dir, elf, None, f"MP bin is missing or empty: {output_dir}"
+        )
+    return ArtifactResult(True, output_dir, elf, mp_bin, "Required artifact checks passed")
 
 
 def _write_log(path: Path, command: Sequence[str], result: CommandResult) -> None:
@@ -281,22 +285,22 @@ def run_step(
 def summarize_build_durations(
     builds: Mapping[str, Mapping[str, object]],
 ) -> BuildDurationSummary:
-    """汇总各构建模式的耗时，单位为秒。"""
+    """Summarize build durations by mode in seconds."""
     by_mode: dict[str, float] = {}
     for mode, result in builds.items():
         duration = result.get("duration_seconds")
         if not isinstance(duration, (int, float)) or not math.isfinite(duration):
-            raise VerificationError(f"{mode} 缺少有效的编译耗时")
+            raise VerificationError(f"{mode} has no valid build duration")
         if duration < 0:
-            raise VerificationError(f"{mode} 的编译耗时不能为负数")
+            raise VerificationError(f"{mode} build duration cannot be negative")
         by_mode[mode] = float(duration)
     return {"by_mode": by_mode, "total": sum(by_mode.values(), 0.0)}
 
 
 def format_duration(seconds: float) -> str:
-    """将非负秒数格式化为秒或“分钟 + 秒”。"""
+    """Format nonnegative seconds as seconds or minutes plus seconds."""
     if not math.isfinite(seconds) or seconds < 0:
-        raise VerificationError("耗时必须是非负有限数值")
+        raise VerificationError("Duration must be a finite nonnegative value")
     rounded_seconds = round(seconds, 1)
     minutes, remaining_seconds = divmod(rounded_seconds, 60)
     if minutes >= 1:
@@ -312,7 +316,7 @@ def run_builds(
 ) -> dict[str, dict[str, object]]:
     results: dict[str, dict[str, object]] = {}
     for mode in modes:
-        print(f"\n[{layout.name}] 构建 {mode}")
+        print(f"\n[{layout.name}] Building {mode}")
         step = run_step(
             build_command(mode, jobs),
             layout.root,
@@ -347,7 +351,7 @@ def run_userdata(layout: WorkspaceLayout, report_dir: Path, required: bool) -> S
     )
     if not romfs.is_file():
         status = "FAIL" if required else "SKIP"
-        return StepResult(status, 0.0, "", f"ROMFS 不存在：{romfs}")
+        return StepResult(status, 0.0, "", f"ROMFS does not exist: {romfs}")
     return run_step(
         ["west", "userdata", "--package-only"],
         layout.root,
@@ -358,7 +362,7 @@ def run_userdata(layout: WorkspaceLayout, report_dir: Path, required: bool) -> S
 def _json_default(value: object) -> object:
     if isinstance(value, Path):
         return str(value)
-    raise TypeError(f"无法序列化：{type(value)!r}")
+    raise TypeError(f"Unable to serialize: {type(value)!r}")
 
 
 def write_json_report(report_dir: Path, summary: dict[str, object]) -> None:
@@ -370,13 +374,13 @@ def write_json_report(report_dir: Path, summary: dict[str, object]) -> None:
 
 
 def write_markdown_report(report_dir: Path, summary: dict[str, object]) -> None:
-    lines = ["# Dashboard 本地构建验证结果", ""]
-    lines.append(f"- 总体结果：**{summary['overall']}**")
-    lines.append(f"- Profile：`{summary['profile']}`")
-    lines.append(f"- 生成时间：`{summary['generated_at']}`")
+    lines = ["# Dashboard Local Build Verification Results", ""]
+    lines.append(f"- Overall result: **{summary['overall']}**")
+    lines.append(f"- Profile: `{summary['profile']}`")
+    lines.append(f"- Generated at: `{summary['generated_at']}`")
     total_duration = summary.get("total_build_duration_seconds")
     if isinstance(total_duration, (int, float)):
-        lines.append(f"- 总编译耗时：`{format_duration(total_duration)}`")
+        lines.append(f"- Total build duration: `{format_duration(total_duration)}`")
     lines.extend(
         ["", "| Workspace | Mode | Result | Duration |", "|---|---|---|---|"]
     )
@@ -393,10 +397,10 @@ def write_markdown_report(report_dir: Path, summary: dict[str, object]) -> None:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="在已有本地 Gerrit/Gitee workspace 中验证 Dashboard GCC 构建"
+        description="Verify Dashboard GCC builds in existing local Gerrit/Gitee workspaces"
     )
-    parser.add_argument("--gerrit", type=Path, help="现有 Gerrit West workspace 根目录")
-    parser.add_argument("--gitee", type=Path, help="现有 Gitee West workspace 根目录")
+    parser.add_argument("--gerrit", type=Path, help="Existing Gerrit West workspace root")
+    parser.add_argument("--gitee", type=Path, help="Existing Gitee West workspace root")
     parser.add_argument("--profile", choices=PROFILES, default="full")
     parser.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     parser.add_argument("--report-dir", type=Path, default=Path("reports"))
@@ -406,9 +410,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--userdata-required", action="store_true")
     args = parser.parse_args(argv)
     if not args.gerrit and not args.gitee:
-        parser.error("至少指定 --gerrit 或 --gitee")
+        parser.error("Specify at least one of --gerrit or --gitee")
     if args.jobs < 1:
-        parser.error("--jobs 必须大于 0")
+        parser.error("--jobs must be greater than 0")
     return args
 
 
@@ -436,7 +440,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         }
 
         for layout in layouts:
-            print(f"\n验证本地 workspace：{layout.name} -> {layout.root}")
+            print(f"\nVerifying local workspace: {layout.name} -> {layout.root}")
             source_dir = report_root / layout.name
             source_dir.mkdir(parents=True, exist_ok=True)
             repositories = list_west_projects(layout)
@@ -489,15 +493,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         write_json_report(report_root, summary)
         write_markdown_report(report_root, summary)
-        print(f"\n总体结果：{summary['overall']}")
-        print(f"总编译耗时：{format_duration(total_build_duration)}")
-        print(f"报告目录：{report_root}")
+        print(f"\nOverall result: {summary['overall']}")
+        print(f"Total build duration: {format_duration(total_build_duration)}")
+        print(f"Report directory: {report_root}")
         return 0 if summary["overall"] == "PASS" else 1
     except VerificationError as exc:
-        print(f"配置或环境错误：{exc}", file=sys.stderr)
+        print(f"Configuration or environment error: {exc}", file=sys.stderr)
         return 2
     except KeyboardInterrupt:
-        print("\n用户中止验证", file=sys.stderr)
+        print("\nVerification interrupted by user", file=sys.stderr)
         return 130
 
 
