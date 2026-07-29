@@ -63,6 +63,11 @@ manifest:
         revision: posix-device
         path: applications/component/posix
 
+      - name: rtl87x3-hmi-protocol
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x3-hmi-protocol
+        path: applications/component/protocol
+
       - name: FlashDB
         remote: gitee
         repo-path: RealMCU/FlashDB
