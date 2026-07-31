@@ -1,0 +1,32 @@
+manifest:
+
+    remotes:
+      - name: gitee
+        url-base: ssh://git@gitee.com
+
+    defaults:
+      remote: gitee
+
+    projects:
+      - name: rtl87x3g-hmi-sdk
+        repo-path: realmcu/rtl87x3g-hmi-sdk
+        revision: master
+        path: zephyrproject
+
+      - name: display
+        repo-path: realmcu/display
+        revision: master
+        path: zephyrproject/modules/display
+
+      - name: lvgl
+        repo-path: HoneyRepo/lvgl
+        revision: lvgl_v9
+        path: zephyrproject/modules/lvgl
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl8773g-smarthome
+        path: zephyrproject/realtek-app/applications/smarthome
+
+    self:
+        path: .manifest

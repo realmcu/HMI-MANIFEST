@@ -3,8 +3,6 @@ manifest:
     remotes:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
-      - name: gitee
-        url-base: https://gitee.com
 
     defaults:
       remote: origin
@@ -42,22 +40,20 @@ manifest:
         revision: lvgl_v9
         path: zephyrproject/modules/lvgl
 
-      - name: hmi
+      - name: honeygui
+        repo-path: HoneyGUI
+        revision: master
+        path: zephyrproject/modules/honeygui
+
+      - name: hmi-smarthome
         repo-path: HoneyRepo/hmi
         revision: rtl8773g-smarthome
         path: zephyrproject/realtek-app/applications/smarthome
 
-      - name: rtl87x3-hmi-posix
+      - name: hmi-dashboard
         repo-path: HoneyRepo/hmi
-        revision: posix-device
-        path: zephyrproject/realtek-app/applications/smarthome/component/posix
-
-      - name: FlashDB
-        remote: gitee
-        repo-path: RealMCU/FlashDB
-        revision: master
-        path: zephyrproject/realtek-app/applications/smarthome/component/FlashDB
-
+        revision: rtl8773g-dashboard
+        path: zephyrproject/realtek-app/applications/dashboard
 
     self:
         path: .manifest
