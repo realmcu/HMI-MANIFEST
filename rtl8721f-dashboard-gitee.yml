@@ -21,7 +21,7 @@ manifest:
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: 45bcd8d424ef57942c43d886719b9ae0fc0311ca
+        revision: 86e14534869e6be0cdaab94dd4dc3f4df919224e
         path: ameba-rtos/component/ui/HoneyGUI
 
       - name: honeygui
@@ -31,7 +31,7 @@ manifest:
 
       - name: honeygui-dashboard-ui
         repo-path: realmcu/honeygui-template-dashboard
-        revision: 97365e24ab227d5a5da5fec5f56e3ba18cdb35fe
+        revision: 49e0b4923d9972c91e80a61813c10d58af4887db
         path: ameba-rtos/component/ui/HoneyGUI/app/dashboard/ui_design
 
 
