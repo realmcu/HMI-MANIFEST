@@ -26,9 +26,9 @@ manifest:
         path: RTL8773EP/board/evb/eBadge/component/protocol
  
       - name: FlashDB
-        remote: gitee
-        repo-path: RealMCU/FlashDB
-        revision: master
+        remote: origin
+        repo-path: HoneyRepo/hmi
+        revision: FlashDB
         path: RTL8773EP/board/evb/eBadge/component/FlashDB
  
       - name: Wearable

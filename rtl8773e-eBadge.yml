@@ -37,9 +37,8 @@ manifest:
         path: honeycomb/sdk/board/evb/eBadge/component/protocol
  
       - name: FlashDB
-        remote: gitee   
-        repo-path: RealMCU/FlashDB
-        revision: master
+        repo-path: HoneyRepo/hmi
+        revision: FlashDB
         path: honeycomb/sdk/board/evb/eBadge/component/FlashDB
 
     self:

@@ -63,9 +63,8 @@ manifest:
 
 
       - name: FlashDB
-        remote: gitee
-        repo-path: RealMCU/FlashDB
-        revision: master
+        repo-path: HoneyRepo/hmi
+        revision: FlashDB
         path: zephyrproject/realtek-app/applications/eBadge_8773g/component/FlashDB
 
       - name: poxis-device

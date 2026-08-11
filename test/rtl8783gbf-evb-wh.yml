@@ -62,9 +62,8 @@ manifest:
 
 
       - name: FlashDB
-        remote: gitee
-        repo-path: RealMCU/FlashDB
-        revision: master
+        repo-path: HoneyRepo/hmi
+        revision: FlashDB
         path: applications/component/FlashDB
 
 
