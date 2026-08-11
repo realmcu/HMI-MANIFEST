@@ -31,6 +31,8 @@
   - [RTL8783G z2plus](#rtl8783g-z2plus)
   - [RTL8773G 8189NIC](#rtl8773g-8189nic)
 - [测试用 manifest](#测试用-manifesttest)
+  - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
+  - [RTL8773G eBadge WH](#rtl8773g-ebadge-wh)
 
 ## 目录结构
 
@@ -358,10 +360,42 @@ west build -b rtl87x3g_watch/rtl8783gbf realtek-app/applications/wifi_nic_sdio
 
 > ⚠️ 该目录下的 manifest 仅用于内部开发测试（例如个人分支、评估板 bring-up），版本可能不稳定，仅限相关开发人员使用。
 
-| 文件 | 说明 |
-| ------ | ---------- |
-| `test/rtl8783gbf-evb-wh.yml` | RTL8783GBF 评估板测试 manifest |
-| `test/rtl8773g-eBadge-wh.yml` | RTL8773G eBadge WH 测试 manifest（内网） |
-| `test/rtl8773g-eBadge-wh-gitee.yml` | RTL8773G eBadge WH 测试 manifest（Gitee 外网） |
+---
+
+### RTL8783GBF EVB WH
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8783gbf-evb-wh.yml .
+west update
+```
+
+---
+
+### RTL8773G eBadge WH
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773g-eBadge-wh.yml .
+west update
+```
+
+**Gitee 公开：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773g-eBadge-wh-gitee.yml .
+west update
+```
+
+**Github 公开：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773g-eBadge-wh-gitee.yml .
+west update
+```
+
+---
 
 > 说明：使用 Gitee / Github manifest 时，仓库目录结构与内部版本不同（例如 SDK 路径为 `sdk/` 或 `RTL8773EP/`），请以对应 `*-gitee.yml` 中的 `path` 字段为准。
