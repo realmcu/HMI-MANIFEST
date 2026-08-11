@@ -13,6 +13,25 @@
 - `<project>.yml`：指向内部 Gerrit 仓库
 - `<project>-gitee.yml`：指向 Gitee / Github 公开仓库（仅部分项目提供）
 
+## 目录
+
+- [目录结构](#目录结构)
+- [正式项目 manifest](#正式项目-manifest)
+  - [RTL8773E Dashboard](#rtl8773e-dashboard)
+  - [RTL8773E eBadge](#rtl8773e-ebadge)
+  - [RTL8773G Deskmate](#rtl8773g-deskmate)
+  - [RTL8773G eBadge](#rtl8773g-ebadge)
+  - [RTL8773G Smarthome](#rtl8773g-smarthome)
+  - [RTL8773G Dashboard](#rtl8773g-dashboard)
+  - [RTL8773G Chargebox](#rtl8773g-chargebox)
+  - [RTL8783GBF eBadge](#rtl8783gbf-ebadge)
+  - [RTL8721F Dashboard](#rtl8721f-dashboard)
+- [Demo 项目 manifest](#demo-项目-manifestdemo)
+  - [RTL8773G CLAW](#rtl8773g-claw)
+  - [RTL8783G z2plus](#rtl8783g-z2plus)
+  - [RTL8773G 8189NIC](#rtl8773g-8189nic)
+- [测试用 manifest](#测试用-manifesttest)
+
 ## 目录结构
 
 - 根目录：正式发布的项目 manifest
