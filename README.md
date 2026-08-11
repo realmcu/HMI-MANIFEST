@@ -11,7 +11,7 @@
 对应地，每个已开源的项目会提供两份 manifest：
 
 - `<project>.yml`：指向内部 Gerrit 仓库
-- `<project>-gitee.yml`：指向 Gitee / Github 公开仓库（仅部分项目提供）
+- `<project>-gitee.yml`：指向 Gitee 或 Github 公开仓库（Gitee 与 Github 共用同一份，仅部分项目提供）
 
 ## 目录
 
