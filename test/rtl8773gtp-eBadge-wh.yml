@@ -1,7 +1,11 @@
 manifest:
 
     remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
       - name: gitee
+        url-base: https://gitee.com
+      - name: gitee-ssh
         url-base: ssh://git@gitee.com
       - name: upstream
         url-base: https://github.com/zephyrproject-rtos
@@ -9,62 +13,68 @@ manifest:
         url-base: https://github.com/ARM-software
 
     defaults:
-      remote: gitee
+      remote: origin
 
     projects:
-      - name: rtl87x3g-hmi-sdk
-        repo-path: realmcu/rtl87x3g-hmi-sdk
+      - name: zephyr
+        repo-path: HoneyRepo/zephyr
+        revision: realtek-main-v3.7
+        path: zephyr
+        import:
+            path-prefix: zephyrproject
+            name-allowlist:
+              - cmsis
+              - tinycrypt
+              - mbedtls
+              - fatfs
+
+      - name: hal_realtek
+        repo-path: HoneyRepo/zephyr-hal
         revision: master
-        path: zephyrproject
+        path: zephyrproject/modules/hal/realtek
+
+      - name: realtek-app
+        repo-path: HoneyRepo/realtek-zephyr-project
+        revision: master
+        path: zephyrproject/realtek-app
 
       - name: display
-        repo-path: realmcu/display
+        repo-path: HoneyRepo/driver/display
         revision: master
         path: zephyrproject/modules/display
 
       - name: honeygui
-        repo-path: realmcu/HoneyGUI
+        repo-path: HoneyGUI
         revision: master
         path: zephyrproject/modules/honeygui
 
       - name: hmi
-        repo-path: realmcu/hmi
+        repo-path: HoneyRepo/hmi
         revision: RTL8773G-eBadge-WH
         path: applications
 
       - name: hmi-script
-        repo-path: realmcu/hmi
+        repo-path: HoneyRepo/hmi
         revision: script
         path: applications/scripts
 
       - name: rtl87x3-hmi-posix
-        repo-path: realmcu/hmi
+        repo-path: HoneyRepo/hmi
         revision: posix-device
         path: applications/component/posix
 
       - name: rtl87x3-hmi-protocol
-        repo-path: realmcu/hmi
+        repo-path: HoneyRepo/hmi
         revision: rtl87x3-hmi-protocol
         path: applications/component/protocol
 
       - name: FlashDB
-        repo-path: realmcu/hmi
+        repo-path: HoneyRepo/hmi
         revision: FlashDB
         path: applications/component/FlashDB
 
-      - name: tflite-micro
-        remote: upstream
-        repo-path: tflite-micro
-        revision: zephyr_20240627
-        path: applications/component/tflite-micro
-
-      - name: CMSIS-NN
-        remote: arm-software
-        repo-path: CMSIS-NN
-        revision: v6.0.0
-        path: applications/component/cmsis-nn
-
       - name: gsensor-algorithm
+        remote: gitee-ssh
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
         path: applications/component/gsensor-algorithm
