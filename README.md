@@ -8,10 +8,11 @@
 - Gitee 公开：`git@gitee.com:realmcu/hmi-manifest.git`
 - Github 公开：`git@github.com:realmcu/HMI-MANIFEST.git`
 
-对应地，每个已开源的项目会提供两份 manifest：
+对应地，每个已开源的项目会提供三份 manifest：
 
 - `<project>.yml`：指向内部 Gerrit 仓库
-- `<project>-gitee.yml`：指向 Gitee 或 Github 公开仓库（Gitee 与 Github 共用同一份，仅部分项目提供）
+- `<project>-gitee.yml`：指向 Gitee 公开仓库（仅部分项目提供）
+- `<project>-github.yml`：指向 GitHub 公开仓库（仅部分项目提供）
 
 ## 目录
 
@@ -65,7 +66,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-dashboard-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-dashboard-github.yml .
 west update
 ```
 
@@ -92,7 +93,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-eBadge-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-eBadge-github.yml .
 west update
 ```
 
@@ -156,7 +157,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-smarthome-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-smarthome-github.yml .
 west update
 ```
 
@@ -186,7 +187,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-dashboard-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-dashboard-github.yml .
 west update
 ```
 
@@ -216,7 +217,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-chargebox-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-chargebox-github.yml .
 west update
 ```
 
@@ -246,7 +247,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8783gbf-eBadge-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8783gbf-eBadge-github.yml .
 west update
 ```
 
@@ -277,7 +278,7 @@ west update
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8721f-dashboard-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8721f-dashboard-github.yml .
 west update
 ```
 

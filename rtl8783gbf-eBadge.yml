@@ -3,8 +3,6 @@ manifest:
     remotes:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
-      - name: gitee
-        url-base: https://gitee.com
       - name: github
         url-base: https://github.com  
 

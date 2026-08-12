@@ -19,12 +19,12 @@ manifest:
         path: zephyrproject/modules/display
 
       - name: lvgl
-        repo-path: HoneyRepo/lvgl
+        repo-path: realmcu/lvgl
         revision: lvgl_v9
         path: zephyrproject/modules/lvgl
 
       - name: hmi
-        repo-path: HoneyRepo/hmi
+        repo-path: realmcu/hmi
         revision: rtl8773g-smarthome
         path: zephyrproject/realtek-app/applications/smarthome
 

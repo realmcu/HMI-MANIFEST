@@ -26,8 +26,7 @@ manifest:
         path: RTL8773EP/board/evb/eBadge/component/protocol
  
       - name: FlashDB
-        remote: origin
-        repo-path: HoneyRepo/hmi
+        repo-path: realmcu/hmi
         revision: FlashDB
         path: RTL8773EP/board/evb/eBadge/component/FlashDB
  
