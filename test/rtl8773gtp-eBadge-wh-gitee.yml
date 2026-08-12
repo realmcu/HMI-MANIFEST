@@ -3,10 +3,6 @@ manifest:
     remotes:
       - name: gitee
         url-base: ssh://git@gitee.com
-      - name: upstream
-        url-base: https://github.com/zephyrproject-rtos
-      - name: arm-software
-        url-base: https://github.com/ARM-software
 
     defaults:
       remote: gitee
