@@ -1,0 +1,58 @@
+manifest:
+
+    remotes:
+      - name: gitee
+        url-base: ssh://git@gitee.com
+
+
+    defaults:
+      remote: gitee
+
+    projects:
+      - name: zephyr-sdk
+        remote: gitee 
+        repo-path: realmcu/rtl87x3g-hmi-sdk
+        revision: master
+        path: zephyrproject
+    
+
+      - name: honeygui
+        remote: gitee
+        repo-path: realmcu/HoneyGUI
+        revision: master
+        path: zephyrproject/modules/honeygui
+
+      - name: hmi
+        repo-path: realmcu/hmi
+        revision: rtl8773g-rtl8711f-eBadge-jelly
+        path: zephyrproject/realtek-app/applications/eBadge_common
+        west-commands: west_commands_extention/west-commands.yml
+
+      - name: ui
+        remote: gitee                         
+        repo-path: realmcu/honeygui-template-EBadge 
+        revision: master                         
+        path: zephyrproject/realtek-app/applications/eBadge_common/app/designer
+
+      - name: rtl87x3-hmi-protocol
+        remote: gitee
+        repo-path: realmcu/hmi
+        revision: rtl87x3-hmi-protocol
+        path: zephyrproject/realtek-app/applications/eBadge_common/component/protocol
+
+
+      - name: FlashDB
+        remote: gitee
+        repo-path: realmcu/hmi
+        revision: FlashDB
+        path: zephyrproject/realtek-app/applications/eBadge_common/component/FlashDB
+
+      - name: poxis-device
+        remote: gitee
+        repo-path: realmcu/hmi
+        revision: posix-device
+        path: zephyrproject/realtek-app/applications/eBadge_common/component/posix-device
+
+
+    self:
+        path: .manifest
