@@ -33,13 +33,14 @@
   - [RTL8773G 8189NIC](#rtl8773g-8189nic)
 - [测试用 manifest](#测试用-manifesttest)
   - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
-  - [RTL8773G eBadge WH](#rtl8773g-ebadge-wh)
+  - [RTL8773GTP eBadge WH](#rtl8773gtp-ebadge-wh)
 
 ## 目录结构
 
 - 根目录：正式发布的项目 manifest
 - `demo/`：Demo / 示例项目的 manifest（如 CLAW、z2plus、8189 NIC 等）
 - `test/`：开发调试用的临时 manifest（个人分支、评估板验证等，不建议外部用户使用）
+- `scripts/`：发布验证脚本（供 `.github/workflows/` 的 nightly 流程调用）
 
 > 使用时请在 `--mf` 参数中带上对应的相对路径，例如 `--mf demo/rtl8773g-claw.yml`。
 
@@ -133,7 +134,7 @@ west update
 **编译：**
 ```bash
 cd zephyrproject
-west build -b rtl87x3g_evb realtek-app/applications/eBadge
+west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
 ```
 
 ---
@@ -372,29 +373,41 @@ west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl
 west update
 ```
 
+**编译：**（该 manifest 把 app 检出到工作区根目录的 `applications/`，不在 `zephyrproject/` 下）
+```bash
+cd applications
+west build -b rtl87x3g_evb
+```
+
 ---
 
-### RTL8773G eBadge WH
+### RTL8773GTP eBadge WH
 
 **内部 Gerrit：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773g-eBadge-wh.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773gtp-eBadge-wh.yml .
 west update
 ```
 
 **Gitee 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773g-eBadge-wh-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773gtp-eBadge-wh-gitee.yml .
 west update
 ```
 
 **Github 公开：**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773g-eBadge-wh-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773gtp-eBadge-wh-gitee.yml .
 west update
+```
+
+**编译：**（该 manifest 把 app 检出到工作区根目录的 `applications/`，不在 `zephyrproject/` 下）
+```bash
+cd applications
+west build -b rtl87x3g_evb
 ```
 
 ---
