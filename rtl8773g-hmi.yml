@@ -55,5 +55,10 @@ manifest:
         revision: rtl8773g-dashboard
         path: zephyrproject/realtek-app/applications/dashboard
 
+      - name: hmi-chargebox
+        repo-path: HoneyRepo/hmi
+        revision: rtl8773g-chargebox
+        path: zephyrproject/realtek-app/applications/chargebox
+
     self:
         path: .manifest

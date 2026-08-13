@@ -28,5 +28,10 @@ manifest:
         revision: lvgl_v9
         path: zephyrproject/modules/lvgl
 
+      - name: hmi
+        repo-path: realmcu/hmi
+        revision: rtl8773g-chargebox
+        path: zephyrproject/realtek-app/applications/chargebox
+
     self:
         path: .manifest
