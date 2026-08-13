@@ -35,6 +35,7 @@
 - [测试用 manifest](#测试用-manifesttest)
   - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
   - [RTL8773GTP eBadge WH](#rtl8773gtp-ebadge-wh)
+  - [RTL87X3G Mijia](#rtl87x3g-mijia)
 
 ## 目录结构
 
@@ -442,6 +443,23 @@ west update
 ```bash
 cd applications
 west build -b rtl87x3g_evb
+```
+
+---
+
+### RTL87X3G Mijia
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl87x3g-mijia.yml .
+west update
+```
+
+**编译：**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_evb realtek-app/applications/mijia
 ```
 
 ---
