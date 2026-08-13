@@ -21,37 +21,42 @@ manifest:
         repo-path: realmcu/HoneyGUI
         revision: master
         path: zephyrproject/modules/honeygui
+        
+      - name: display
+        repo-path: realmcu/display
+        revision: master
+        path: zephyrproject/modules/display
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: rtl8773g-rtl8711f-eBadge-jelly
-        path: zephyrproject/realtek-app/applications/eBadge_common
+        revision: rtl8773g-eBadge
+        path: zephyrproject/realtek-app/applications/eBadge_8773g
         west-commands: west_commands_extention/west-commands.yml
 
       - name: ui
         remote: gitee                         
         repo-path: realmcu/honeygui-template-EBadge 
         revision: master                         
-        path: zephyrproject/realtek-app/applications/eBadge_common/app/designer
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/app/designer
 
       - name: rtl87x3-hmi-protocol
         remote: gitee
         repo-path: realmcu/hmi
         revision: rtl87x3-hmi-protocol
-        path: zephyrproject/realtek-app/applications/eBadge_common/component/protocol
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/protocol
 
 
       - name: FlashDB
         remote: gitee
         repo-path: realmcu/hmi
         revision: FlashDB
-        path: zephyrproject/realtek-app/applications/eBadge_common/component/FlashDB
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/FlashDB
 
       - name: poxis-device
         remote: gitee
         repo-path: realmcu/hmi
         revision: posix-device
-        path: zephyrproject/realtek-app/applications/eBadge_common/component/posix-device
+        path: zephyrproject/realtek-app/applications/eBadge_8773g/component/posix-device
 
 
     self:

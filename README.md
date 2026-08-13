@@ -22,6 +22,7 @@
   - [RTL8773E eBadge](#rtl8773e-ebadge)
   - [RTL8773G Deskmate](#rtl8773g-deskmate)
   - [RTL8773G eBadge](#rtl8773g-ebadge)
+  - [RTL8773G + RTL8711F eBadge](#rtl8773g-rtl8711f-ebadge)
   - [RTL8773G Smarthome](#rtl8773g-smarthome)
   - [RTL8773G Dashboard](#rtl8773g-dashboard)
   - [RTL8773G Chargebox](#rtl8773g-chargebox)
@@ -129,12 +130,45 @@ west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g
 west update
 ```
 
-**Gitee / Github：** 暂未开源
+**Gitee 公开：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-eBadge-gitee.yml .
+west update
+```
+
+**Github：** 暂未开源
 
 **编译：**
 ```bash
 cd zephyrproject
 west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
+```
+
+---
+
+### RTL8773G RTL8711F eBadge
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-rtl8711f-eBadge.yml .
+west update
+```
+
+**Gitee 公开：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-rtl8711f-eBadge-gitee.yml .
+west update
+```
+
+**Github：** 暂未开源
+
+**编译：**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g_8711f
 ```
 
 ---
