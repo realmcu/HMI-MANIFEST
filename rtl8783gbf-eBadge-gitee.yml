@@ -29,6 +29,11 @@ manifest:
         path: zephyrproject/realtek-app/applications/eBadge
         west-commands: west_commands_extention/west-commands.yml
 
+      - name: ui                     
+        repo-path: realmcu/honeygui-template-EBadge 
+        revision: dev_8783                         
+        path: zephyrproject/realtek-app/applications/eBadge/app/designer 
+
       - name: rtl87x3-hmi-protocol
         repo-path: realmcu/hmi
         revision: rtl87x3-hmi-protocol

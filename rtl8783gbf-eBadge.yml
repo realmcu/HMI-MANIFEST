@@ -51,7 +51,7 @@ manifest:
       - name: ui
         remote: github                         
         repo-path: realmcu/honeygui-template-EBadge 
-        revision: main                         
+        revision: dev_8783                         
         path: zephyrproject/realtek-app/applications/eBadge/app/designer 
 
       - name: rtl87x3-hmi-protocol

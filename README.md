@@ -290,7 +290,7 @@ west update
 **编译：**
 ```bash
 cd zephyrproject
-west build -b rtl87x3g_watch/rtl8783gbf realtek-app/applications/eBadge
+west build -b rtl87x3g_evb realtek-app/applications/eBadge
 ```
 
 ---
