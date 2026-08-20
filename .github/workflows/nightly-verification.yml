@@ -17,7 +17,8 @@ jobs:
   dashboard:
     name: Dashboard GCC full build
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    # A healthy run takes ~10 min; per-step timeouts below catch the real stalls.
+    timeout-minutes: 60
 
     env:
       WORKSPACE_DIR: ${{ github.workspace }}
@@ -25,14 +26,18 @@ jobs:
 
     steps:
       - name: Checkout manifest
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: .manifest
 
       - name: Install build dependencies
+        timeout-minutes: 15
+        env:
+          # A stalled mirror used to hang here until the job timeout fired.
+          APT_OPTS: -o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends \
+          sudo apt-get ${APT_OPTS} update
+          sudo apt-get ${APT_OPTS} install --yes --no-install-recommends \
             cmake \
             gcc-arm-none-eabi \
             libnewlib-arm-none-eabi \
@@ -43,11 +48,24 @@ jobs:
             west==1.2.0
 
       - name: Initialize release workspace
+        timeout-minutes: 30
         run: |
           west init \
             -l "${GITHUB_WORKSPACE}/.manifest" \
             --mf rtl8773e-dashboard-gitee.yml
-          west update -n
+          # Gitee fetches flake regularly (GnuTLS recv error -110, early EOF).
+          # west update resumes cleanly, so retry before giving up.
+          for attempt in 1 2 3; do
+            if west update -n; then
+              exit 0
+            fi
+            if [ "${attempt}" -lt 3 ]; then
+              echo "::warning::west update failed (attempt ${attempt}/3), retrying in 30s"
+              sleep 30
+            fi
+          done
+          echo "::error::west update failed after 3 attempts"
+          exit 1
 
       - name: Record manifest revisions
         working-directory: ${{ env.WORKSPACE_DIR }}
@@ -63,6 +81,7 @@ jobs:
           git -C "${WORKSPACE_DIR}/sdk" config core.fileMode false
 
       - name: Run project verification
+        timeout-minutes: 40
         run: |
           python "${GITHUB_WORKSPACE}/.manifest/scripts/verify_dashboard.py" \
             --gitee "${WORKSPACE_DIR}" \
@@ -82,7 +101,7 @@ jobs:
 
       - name: Upload verification reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dashboard-release-verification-${{ github.run_id }}
           path: |
