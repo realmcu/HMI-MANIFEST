@@ -15,14 +15,31 @@ concurrency:
 
 jobs:
   dashboard:
-    name: Dashboard GCC full build
+    # floating: tracks branch heads, allowed to break, tells us what regressed.
+    # locked:   the fully pinned known-good snapshot. It must never break; if it
+    #           does, the escape hatch is gone (upstream force-push, dropped
+    #           object) and that is more urgent than a floating failure.
+    name: Dashboard GCC full build (${{ matrix.track }})
     runs-on: ubuntu-24.04
     # A healthy run takes ~10 min; per-step timeouts below catch the real stalls.
     timeout-minutes: 60
 
+    strategy:
+      # One track breaking must not hide the other track's result.
+      fail-fast: false
+      matrix:
+        include:
+          - track: floating
+            manifest: rtl8773e-dashboard-gitee.yml
+          - track: locked
+            manifest: rtl8773e-dashboard-gitee.lock.yml
+
     env:
       WORKSPACE_DIR: ${{ github.workspace }}
       REPORT_DIR: ${{ github.workspace }}/reports
+      LOCK_FILE: ${{ github.workspace }}/.manifest/rtl8773e-dashboard-gitee.lock.yml
+      FLOATING_FILE: ${{ github.workspace }}/.manifest/rtl8773e-dashboard-gitee.yml
+      CANDIDATE_FILE: ${{ github.workspace }}/manifest-revisions.yml
 
     steps:
       - name: Checkout manifest
@@ -45,14 +62,15 @@ jobs:
             ninja-build
           python -m pip install --disable-pip-version-check \
             kconfiglib \
+            PyYAML \
             west==1.2.0
 
-      - name: Initialize release workspace
+      - name: Initialize workspace
         timeout-minutes: 30
         run: |
           west init \
             -l "${GITHUB_WORKSPACE}/.manifest" \
-            --mf rtl8773e-dashboard-gitee.yml
+            --mf "${{ matrix.manifest }}"
           # Gitee fetches flake regularly (GnuTLS recv error -110, early EOF).
           # west update resumes cleanly, so retry before giving up.
           for attempt in 1 2 3; do
@@ -67,9 +85,23 @@ jobs:
           echo "::error::west update failed after 3 attempts"
           exit 1
 
-      - name: Record manifest revisions
+      - name: Record verified revisions
         working-directory: ${{ env.WORKSPACE_DIR }}
-        run: west manifest --freeze > "${GITHUB_WORKSPACE}/manifest-revisions.yml"
+        run: west manifest --freeze > "${CANDIDATE_FILE}"
+
+      # Answers "what landed since the last known-good snapshot" *before* the
+      # build runs, so the report survives a build failure and narrows triage
+      # from six repositories to the one or two that actually moved.
+      - name: Report drift against locked manifest
+        if: matrix.track == 'floating'
+        continue-on-error: true
+        run: |
+          python "${GITHUB_WORKSPACE}/.manifest/scripts/bump_lock.py" \
+            --lock "${LOCK_FILE}" \
+            --candidate "${CANDIDATE_FILE}" \
+            --floating "${FLOATING_FILE}" \
+            --repos "${WORKSPACE_DIR}" \
+            --report "${GITHUB_WORKSPACE}/drift.md"
 
       - name: Restore release tool permissions
         run: |
@@ -89,23 +121,128 @@ jobs:
             --jobs "$(nproc)" \
             --report-dir "${REPORT_DIR}"
 
+      # Package a ready-to-submit lock only after the floating build passes.
+      # GitHub never commits it: the local promotion script validates this
+      # package and submits the resulting change through Gerrit.
+      - name: Package lock promotion
+        if: matrix.track == 'floating' && success()
+        env:
+          PROMOTION_DIR: ${{ github.workspace }}/promotion
+          PROMOTION_LOCK: ${{ github.workspace }}/promotion/rtl8773e-dashboard-gitee.lock.yml
+          PROMOTION_REPORT: ${{ github.workspace }}/promotion/promotion-report.md
+          PROMOTION_METADATA: ${{ github.workspace }}/promotion/promotion-metadata.json
+        run: |
+          mkdir -p "${PROMOTION_DIR}"
+          cp "${LOCK_FILE}" "${PROMOTION_LOCK}"
+          cp "${FLOATING_FILE}" "${PROMOTION_DIR}/rtl8773e-dashboard-gitee.yml"
+          python "${GITHUB_WORKSPACE}/.manifest/scripts/bump_lock.py" \
+            --lock "${PROMOTION_LOCK}" \
+            --candidate "${CANDIDATE_FILE}" \
+            --floating "${FLOATING_FILE}" \
+            --repos "${WORKSPACE_DIR}" \
+            --report "${PROMOTION_REPORT}" \
+            --write \
+            --verified "GitHub Actions run ${GITHUB_RUN_ID} ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          lock = Path(os.environ["PROMOTION_LOCK"])
+          floating = Path(os.environ["FLOATING_FILE"])
+          metadata = {
+              "schema_version": 1,
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "workflow_file": "nightly-verification.yml",
+              "run_id": int(os.environ["GITHUB_RUN_ID"]),
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "run_url": (
+                  f'{os.environ["GITHUB_SERVER_URL"]}/'
+                  f'{os.environ["GITHUB_REPOSITORY"]}/actions/runs/'
+                  f'{os.environ["GITHUB_RUN_ID"]}'
+              ),
+              "manifest_commit": os.environ["GITHUB_SHA"],
+              "source_manifest": "rtl8773e-dashboard-gitee.yml",
+              "source_manifest_sha256": hashlib.sha256(floating.read_bytes()).hexdigest(),
+              "lock_file": lock.name,
+              "lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(),
+              "track": "floating",
+              "build_result": "success",
+          }
+          Path(os.environ["PROMOTION_METADATA"]).write_text(
+              json.dumps(metadata, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload lock promotion
+        if: matrix.track == 'floating' && success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dashboard-lock-promotion-${{ github.run_id }}
+          path: promotion/
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Add result to job summary
         if: always()
         run: |
-          summary="$(find "${REPORT_DIR}" -name summary.md -type f -print -quit 2>/dev/null || true)"
-          if [ -n "${summary}" ]; then
-            cat "${summary}" >> "${GITHUB_STEP_SUMMARY}"
-          else
-            echo "Project verification did not produce a summary." >> "${GITHUB_STEP_SUMMARY}"
-          fi
+          {
+            echo "## Track: \`${{ matrix.track }}\` (\`${{ matrix.manifest }}\`)"
+            echo
+            summary="$(find "${REPORT_DIR}" -name summary.md -type f -print -quit 2>/dev/null || true)"
+            if [ -n "${summary}" ]; then
+              cat "${summary}"
+            else
+              echo "Project verification did not produce a summary."
+            fi
+            if [ -f "${GITHUB_WORKSPACE}/drift.md" ]; then
+              echo
+              echo "<details><summary>Drift against locked manifest</summary>"
+              echo
+              cat "${GITHUB_WORKSPACE}/drift.md"
+              echo
+              echo "</details>"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      # Only a green floating build produces a promotion candidate. A failure
+      # leaves the locked manifest exactly where it was, which is the whole
+      # point: the escape hatch never regresses.
+      - name: Announce promotion candidate
+        if: matrix.track == 'floating' && success()
+        run: |
+          {
+            echo
+            echo "### Promotion candidate"
+            echo
+            echo "This revision set built clean. Artifact"
+            echo "\`dashboard-lock-promotion-${GITHUB_RUN_ID}\` contains the"
+            echo "ready-to-submit lock, its review report, and provenance"
+            echo "metadata. GitHub made no git commit. Promote it locally through"
+            echo "Gerrit (never push it straight to Gitee/GitHub):"
+            echo
+            echo '```powershell'
+            echo "python .manifest/scripts/promote_lock.py prepare"
+            echo "# Review the isolated worktree path printed by prepare."
+            echo "python .manifest/scripts/promote_lock.py submit"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Flag broken locked manifest
+        if: matrix.track == 'locked' && failure()
+        run: |
+          echo "::error::The locked manifest no longer builds. The known-good escape hatch is gone; treat this as higher priority than a floating failure (likely an upstream force-push or a dropped object)."
 
       - name: Upload verification reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: dashboard-release-verification-${{ github.run_id }}
+          name: dashboard-verification-${{ matrix.track }}-${{ github.run_id }}
           path: |
             reports/
             manifest-revisions.yml
+            drift.md
           if-no-files-found: warn
           retention-days: 30
