@@ -444,6 +444,23 @@ west update
 cd applications
 west build -b rtl87x3g_evb
 ```
+**烧录：**
+
+> 首次烧录前需先烧录 运行时：
+
+```bash
+cd applications
+scripts\flash-runtime-win32.bat COM3     # Windows 首次
+scripts/flash-runtime-linux.sh /dev/ttyUSB0  # Linux 首次
+```
+
+> 之后每次烧录 app即可：
+
+```bash
+cd applications
+scripts\flash-win32-app.bat COM3           # Windows
+scripts/flash-linux-app.sh /dev/ttyUSB0    # Linux
+```
 
 ---
 
