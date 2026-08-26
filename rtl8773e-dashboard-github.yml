@@ -1,11 +1,11 @@
 manifest:
 
     remotes:
-      - name: github
+      - name: origin
         url-base: https://github.com
 
     defaults:
-      remote: github
+      remote: origin
 
     projects:
       - name: rtl87x3ep-hmi-sdk

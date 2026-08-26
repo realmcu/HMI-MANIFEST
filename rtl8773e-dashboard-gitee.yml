@@ -3,8 +3,7 @@ manifest:
     remotes:
       - name: origin
         url-base: https://gitee.com
-      - name: github
-        url-base: https://github.com
+
     defaults:
       remote: origin
 
@@ -36,7 +35,6 @@ manifest:
         path: sdk/src/mcu/display
 
       - name: ui
-        remote: github
         repo-path: realmcu/honeygui-template-dashboard
         revision: dev_lite
         path: sdk/board/evb/hmi_dashboard/src/application/designer
