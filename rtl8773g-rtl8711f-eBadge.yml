@@ -48,6 +48,11 @@ manifest:
         path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f
         west-commands: west_commands_extention/west-commands.yml
 
+      - name: hmi-script
+        repo-path: HoneyRepo/hmi
+        revision: script
+        path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f/scripts
+
       - name: ui
         remote: gitee                         
         repo-path: ShelDeng1/mi-ebadge
