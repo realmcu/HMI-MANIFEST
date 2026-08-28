@@ -59,12 +59,6 @@ manifest:
         revision: master                         
         path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f/app/designer
 
-      - name: rtl87x3-hmi-protocol
-        repo-path: HoneyRepo/hmi
-        revision: rtl87x3-hmi-protocol
-        path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f/component/protocol
-
-
       - name: FlashDB
         repo-path: HoneyRepo/hmi
         revision: FlashDB

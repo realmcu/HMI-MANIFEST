@@ -44,13 +44,6 @@ manifest:
         revision: master                         
         path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f/app/designer
 
-      - name: rtl87x3-hmi-protocol
-        remote: gitee
-        repo-path: realmcu/hmi
-        revision: rtl87x3-hmi-protocol
-        path: zephyrproject/realtek-app/applications/eBadge_8773g_8711f/component/protocol
-
-
       - name: FlashDB
         remote: gitee
         repo-path: realmcu/hmi
