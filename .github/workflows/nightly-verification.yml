@@ -225,7 +225,7 @@ jobs:
             echo
             echo '```powershell'
             echo "python .manifest/scripts/promote_lock.py prepare"
-            echo "# Review the isolated worktree path printed by prepare."
+            echo "# Review the lock diff in the current checkout."
             echo "python .manifest/scripts/promote_lock.py submit"
             echo '```'
           } >> "${GITHUB_STEP_SUMMARY}"

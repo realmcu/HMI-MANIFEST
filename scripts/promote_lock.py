@@ -5,8 +5,8 @@ GitHub Actions builds the floating manifest and publishes a promotion package,
 but never writes git history. This script downloads and validates that package,
 then deliberately splits the local side into two commands:
 
-  prepare  download, validate, create a branch, and update the lock file
-  submit   commit the reviewed diff and push it to Gerrit for review
+  prepare  download, validate, and update the current checkout's lock file
+  submit   commit the reviewed lock and push it to Gerrit for review
 
 The split leaves an explicit review point (`git diff`) before the outward-facing
 Gerrit push. Lock contents are copied byte-for-byte from the CI package; the
@@ -104,7 +104,7 @@ def run(
 
 
 def git(manifest_repo: Path, *args: str, check: bool = True) -> str:
-    return run(["git", "-C", str(manifest_repo), *args], check=check).stdout.strip()
+    return run(["git", "-C", str(manifest_repo), *args], check=check).stdout.rstrip()
 
 
 def sha256(path: Path) -> str:
@@ -118,20 +118,6 @@ def sha256(path: Path) -> str:
 def require_command(name: str) -> None:
     if shutil.which(name) is None:
         raise PromotionError(f"Required command is missing: {name}")
-
-
-def require_clean(manifest_repo: Path) -> None:
-    status = git(manifest_repo, "status", "--porcelain")
-    if status:
-        raise PromotionError(
-            "The manifest repository must be clean before prepare.\n"
-            f"Current changes:\n{status}"
-        )
-
-
-def git_path(manifest_repo: Path, name: str) -> Path:
-    value = git(manifest_repo, "rev-parse", "--path-format=absolute", "--git-path", name)
-    return Path(value)
 
 
 def common_git_dir(manifest_repo: Path) -> Path:
@@ -430,14 +416,21 @@ def ensure_expected_diff(manifest_repo: Path, expected_file: str) -> None:
 
     status = [
         line
-        for line in git(manifest_repo, "status", "--porcelain", "--untracked-files=all").splitlines()
+        for line in git(
+            manifest_repo,
+            "status",
+            "--porcelain",
+            "--untracked-files=all",
+            "--",
+            expected_file,
+        ).splitlines()
         if line
     ]
     changed = [line[3:] for line in status if len(line) >= 4]
     if changed != [expected_file]:
         shown = ", ".join(changed) if changed else "<none>"
         raise PromotionError(
-            f"Expected only {expected_file} to be modified; actual changes: {shown}"
+            f"Expected {expected_file} to be modified; actual changes: {shown}"
         )
     if status[0].startswith("?? "):
         text = (manifest_repo / expected_file).read_text(encoding="utf-8")
@@ -452,7 +445,7 @@ def ensure_expected_diff(manifest_repo: Path, expected_file: str) -> None:
             )
     else:
         check = run(
-            ["git", "-C", str(manifest_repo), "diff", "--check"],
+            ["git", "-C", str(manifest_repo), "diff", "--check", "--", expected_file],
             check=False,
         )
         if check.returncode != 0:
@@ -465,7 +458,27 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
     if pending_state.exists():
         raise PromotionError(
             f"A promotion is already prepared: {pending_state}\n"
-            "Submit it or delete the state file after manually abandoning its worktree."
+            "Submit it or delete the state file after manually abandoning it."
+        )
+
+    branch = git(manifest_repo, "branch", "--show-current")
+    if not branch:
+        raise PromotionError("The manifest repository is in detached HEAD state")
+
+    staged = git(manifest_repo, "diff", "--cached", "--name-only")
+    if staged:
+        raise PromotionError(f"Unexpected staged changes:\n{staged}")
+    lock_status = git(
+        manifest_repo,
+        "status",
+        "--porcelain",
+        "--untracked-files=all",
+        "--",
+        LOCK_NAME,
+    )
+    if lock_status:
+        raise PromotionError(
+            f"{LOCK_NAME} already has local changes; review or discard them before prepare"
         )
 
     floating_path = manifest_repo / FLOATING_NAME
@@ -474,9 +487,8 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
         raise PromotionError("Run this script from the manifest repository checkout")
 
     temporary: tempfile.TemporaryDirectory[str] | None = None
-    promotion_worktree: Path | None = None
-    prepared = False
     expected_run_id: int | None = args.run_id
+    lock_written = False
     try:
         if args.package:
             package_dir = args.package.expanduser().resolve()
@@ -509,63 +521,21 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
             str(package.metadata["manifest_commit"]),
         )
         git(manifest_repo, "fetch", "gerrit", "master")
-
-        branch = f"promote-dashboard-lock-{run_id}"
-        branch_check = run(
-            [
-                "git",
-                "-C",
-                str(manifest_repo),
-                "show-ref",
-                "--verify",
-                "--quiet",
-                f"refs/heads/{branch}",
-            ],
-            check=False,
-        )
-        if branch_check.returncode == 0:
+        if git(manifest_repo, "rev-parse", "HEAD") != git(
+            manifest_repo, "rev-parse", "gerrit/master"
+        ):
             raise PromotionError(
-                f"Local branch {branch} already exists; inspect or delete it before retrying"
+                "The current checkout must be exactly at gerrit/master before prepare"
             )
 
-        worktree_root = common_git_dir(manifest_repo) / "lock-promotions"
-        promotion_worktree = worktree_root / str(run_id)
-        if promotion_worktree.exists():
-            raise PromotionError(
-                f"Promotion worktree already exists: {promotion_worktree}; "
-                "inspect or remove it before retrying"
-            )
-        worktree_root.mkdir(parents=True, exist_ok=True)
-        git(
-            manifest_repo,
-            "worktree",
-            "add",
-            "-b",
-            branch,
-            str(promotion_worktree),
-            "gerrit/master",
-        )
-
-        promotion_floating = promotion_worktree / FLOATING_NAME
-        promotion_lock = promotion_worktree / LOCK_NAME
-        # Revalidate against the actual Gerrit base checked out in the isolated
-        # worktree. The user's current branch and unrelated edits stay untouched.
-        package = validate_package(
-            package_dir,
-            repository=args.repository,
-            workflow=args.workflow,
-            expected_run_id=run_id,
-            expected_manifest_commit=(artifact.head_sha if not args.package else None),
-            floating_path=promotion_floating,
-        )
-        promotion_lock.write_bytes(package.lock_path.read_bytes())
-        ensure_expected_diff(promotion_worktree, LOCK_NAME)
-
+        target_lock.write_bytes(package.lock_path.read_bytes())
+        lock_written = True
+        ensure_expected_diff(manifest_repo, LOCK_NAME)
         state = {
-            "schema_version": 1,
+            "schema_version": 2,
             "phase": "prepared",
             "branch": branch,
-            "worktree": str(promotion_worktree),
+            "checkout": str(manifest_repo),
             "base": git(manifest_repo, "rev-parse", "gerrit/master"),
             "run_id": run_id,
             "run_url": package.metadata["run_url"],
@@ -573,40 +543,23 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
             "lock_sha256": candidate_hash,
         }
         save_state(pending_state, state)
-        prepared = True
 
-        # Stop retaining references to temporary package paths before cleanup
-        # (important on Windows).
-        del package
-        print(f"Prepared GitHub run {run_id} on branch {branch}.")
+        print(f"Prepared GitHub run {run_id} in the current checkout.")
         print(f"Build: {state['run_url']}")
-        print(f"Isolated worktree: {promotion_worktree}")
+        print(f"Updated: {target_lock}")
         print("\nReview before submitting:")
-        print(f"  git -C {promotion_worktree} diff -- {LOCK_NAME}")
+        print(f"  git diff -- {LOCK_NAME}")
         print(f"  python {Path(__file__).resolve()} submit")
         return 0
+    except Exception:
+        if lock_written:
+            git(manifest_repo, "checkout", "--", LOCK_NAME, check=False)
+        if pending_state.exists():
+            pending_state.unlink()
+        raise
     finally:
         if temporary is not None:
             temporary.cleanup()
-        if promotion_worktree is not None and not prepared:
-            if promotion_worktree.exists():
-                run(
-                    [
-                        "git",
-                        "-C",
-                        str(manifest_repo),
-                        "worktree",
-                        "remove",
-                        "--force",
-                        str(promotion_worktree),
-                    ],
-                    check=False,
-                )
-            if "branch" in locals():
-                run(
-                    ["git", "-C", str(manifest_repo), "branch", "-D", branch],
-                    check=False,
-                )
 
 
 def commit_message(state: dict[str, Any]) -> tuple[str, str]:
@@ -627,7 +580,7 @@ def validate_state(state: dict[str, Any]) -> None:
         "schema_version",
         "phase",
         "branch",
-        "worktree",
+        "checkout",
         "base",
         "run_id",
         "run_url",
@@ -637,10 +590,10 @@ def validate_state(state: dict[str, Any]) -> None:
     expected = required | ({"commit"} if state.get("phase") == "committed" else set())
     if set(state) != expected:
         raise PromotionError("Promotion state has an unexpected schema")
-    if state["schema_version"] != 1 or state["phase"] not in {"prepared", "committed"}:
+    if state["schema_version"] != 2 or state["phase"] not in {"prepared", "committed"}:
         raise PromotionError("Promotion state has an unsupported version or phase")
-    if not isinstance(state["worktree"], str) or not state["worktree"]:
-        raise PromotionError("Promotion state has no valid worktree path")
+    if not isinstance(state["checkout"], str) or not state["checkout"]:
+        raise PromotionError("Promotion state has no valid checkout path")
     if state["phase"] == "committed":
         commit = state["commit"]
         if not isinstance(commit, str) or not FULL_SHA.match(commit):
@@ -655,24 +608,26 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
     state = load_json(pending_state, "promotion state")
     validate_state(state)
 
-    promotion_worktree = Path(state["worktree"])
-    if not promotion_worktree.is_dir():
-        raise PromotionError(f"Prepared promotion worktree is missing: {promotion_worktree}")
-    branch = git(promotion_worktree, "branch", "--show-current")
+    prepared_checkout = Path(state["checkout"])
+    if prepared_checkout.resolve() != manifest_repo.resolve():
+        raise PromotionError("The promotion was prepared in a different checkout")
+    branch = git(manifest_repo, "branch", "--show-current")
     if branch != state["branch"]:
         raise PromotionError(
-            f"Prepared branch is {state['branch']}, but worktree branch is "
+            f"Prepared branch is {state['branch']}, but current branch is "
             f"{branch or 'DETACHED'}"
         )
 
-    target_lock = promotion_worktree / LOCK_NAME
+    target_lock = manifest_repo / LOCK_NAME
     if sha256(target_lock) != state["lock_sha256"]:
         raise PromotionError(
             "The prepared lock changed after validation; rerun prepare instead of submitting"
         )
 
     if state["phase"] == "prepared":
-        ensure_expected_diff(promotion_worktree, LOCK_NAME)
+        if git(manifest_repo, "rev-parse", "HEAD") != state["base"]:
+            raise PromotionError("HEAD moved after prepare; rerun prepare on the new base")
+        ensure_expected_diff(manifest_repo, LOCK_NAME)
         hook = common_git_dir(manifest_repo) / "hooks" / "commit-msg"
         if not hook.is_file():
             raise PromotionError(
@@ -681,12 +636,19 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
             )
 
         subject, body = commit_message(state)
-        git(promotion_worktree, "add", "--", LOCK_NAME)
-        # capture_output remains enabled so commit hooks cannot flood the caller,
-        # while any failure is still surfaced verbatim by run().
-        git(promotion_worktree, "commit", "-m", subject, "-m", body)
-        commit = git(promotion_worktree, "rev-parse", "HEAD")
-        message = git(promotion_worktree, "log", "-1", "--format=%B")
+        git(
+            manifest_repo,
+            "commit",
+            "--only",
+            "-m",
+            subject,
+            "-m",
+            body,
+            "--",
+            LOCK_NAME,
+        )
+        commit = git(manifest_repo, "rev-parse", "HEAD")
+        message = git(manifest_repo, "log", "-1", "--format=%B")
         if not re.search(r"^Change-Id: I[0-9a-f]{40}$", message, re.MULTILINE):
             raise PromotionError(
                 "Commit was created but has no Gerrit Change-Id; do not push it. "
@@ -698,22 +660,21 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
         print(f"Created commit {commit[:12]}.")
     else:
         commit = state["commit"]
-        if git(promotion_worktree, "rev-parse", "HEAD") != commit:
-            raise PromotionError("HEAD no longer matches the prepared promotion commit")
-        if git(promotion_worktree, "status", "--porcelain"):
-            raise PromotionError("Worktree changed after the promotion commit was created")
+        if git(manifest_repo, "rev-parse", "HEAD") != commit:
+            raise PromotionError("HEAD no longer matches the promotion commit")
+        if git(manifest_repo, "status", "--porcelain", "--", LOCK_NAME):
+            raise PromotionError("The lock changed after the promotion commit was created")
 
     remote_url = git(manifest_repo, "remote", "get-url", "gerrit")
     if "cn4soc.rtkbf.com" not in remote_url:
         raise PromotionError(f"Refusing to push to unexpected Gerrit remote: {remote_url}")
 
     print(f"Pushing {state['branch']} to Gerrit for review...")
-    # Explicit `submit` is the user's authorization for this outward-facing push.
     run(
         [
             "git",
             "-C",
-            str(promotion_worktree),
+            str(manifest_repo),
             "push",
             "gerrit",
             "HEAD:refs/for/master",
@@ -721,17 +682,7 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
         capture=False,
     )
     pending_state.unlink()
-    run(
-        [
-            "git",
-            "-C",
-            str(manifest_repo),
-            "worktree",
-            "remove",
-            str(promotion_worktree),
-        ]
-    )
-    print("Gerrit review submitted successfully; promotion worktree removed.")
+    print("Gerrit review submitted successfully.")
     return 0
 
 
@@ -741,7 +692,34 @@ def status(_args: argparse.Namespace, manifest_repo: Path) -> int:
         print("No lock promotion is currently prepared.")
         return 0
     state = load_json(path, "promotion state")
+    validate_state(state)
     print(json.dumps(state, indent=2, sort_keys=True))
+    return 0
+
+
+def abort(_args: argparse.Namespace, manifest_repo: Path) -> int:
+    path = state_path(manifest_repo)
+    if not path.is_file():
+        print("No lock promotion is currently prepared.")
+        return 0
+    state = load_json(path, "promotion state")
+    validate_state(state)
+    if state["phase"] != "prepared":
+        raise PromotionError("The promotion is already committed; abort it with git manually")
+    target_lock = manifest_repo / LOCK_NAME
+    if sha256(target_lock) != state["lock_sha256"]:
+        raise PromotionError("The prepared lock changed; refusing to discard it")
+    git(
+        manifest_repo,
+        "restore",
+        "--source=HEAD",
+        "--staged",
+        "--worktree",
+        "--",
+        LOCK_NAME,
+    )
+    path.unlink()
+    print(f"Discarded the prepared update to {LOCK_NAME}.")
     return 0
 
 
@@ -765,6 +743,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
     subparsers.add_parser("submit", help="commit the reviewed lock and push it to Gerrit")
     subparsers.add_parser("status", help="show the pending local promotion state")
+    subparsers.add_parser("abort", help="discard a prepared lock update")
     return parser.parse_args(argv)
 
 
@@ -780,6 +759,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return prepare(args, manifest_repo)
         if args.command == "submit":
             return submit(args, manifest_repo)
+        if args.command == "abort":
+            return abort(args, manifest_repo)
         return status(args, manifest_repo)
     except PromotionError as exc:
         print(f"Promotion error: {exc}", file=sys.stderr)
