@@ -66,23 +66,82 @@ jobs:
             west==1.2.0
 
       - name: Initialize workspace
-        timeout-minutes: 30
+        timeout-minutes: 45
+        # A Gitee failure is usually a transient rate-limit / network flake
+        # (HTTP 429, GnuTLS recv error -110). Retry hard first, then fall back
+        # to the GitHub mirror so the nightly still validates the same six
+        # repositories (they are mirrored one-to-one). A fallback is recorded
+        # below so the promotion step never turns a GitHub-verified snapshot
+        # into a Gitee release lock.
         run: |
+          set -o pipefail
+          MANIFEST_FILE="${{ matrix.manifest }}"
+          # Only the floating (branch-tracking) manifest has a GitHub mirror to
+          # fall back to. The locked manifest is fully SHA-pinned: the same
+          # commits exist on both hosts, so switching its manifest file would
+          # not change anything -- it just retries harder in place.
+          if [ "${{ matrix.track }}" = "floating" ]; then
+            FALLBACK_MANIFEST="${MANIFEST_FILE%-gitee.yml}-github.yml"
+          else
+            FALLBACK_MANIFEST=""
+          fi
+          # The retry budget has to fit inside the step timeout above: a cold
+          # clone of this workspace takes a few minutes, so 4 gitee attempts
+          # plus 2 mirror attempts must still finish well under 45 minutes.
+          # Retry harder than that and the step gets killed before the
+          # fallback ever runs, which defeats the purpose.
+          RETRIES=4
+          FALLBACK_RETRIES=2
+
+          # west init runs exactly once; re-init on an existing workspace
+          # errors with "already initialized". Switch manifests instead with
+          # `west config manifest.file` and re-update.
           west init \
             -l "${GITHUB_WORKSPACE}/.manifest" \
-            --mf "${{ matrix.manifest }}"
-          # Gitee fetches flake regularly (GnuTLS recv error -110, early EOF).
-          # west update resumes cleanly, so retry before giving up.
-          for attempt in 1 2 3; do
-            if west update -n; then
+            --mf "${MANIFEST_FILE}" \
+            || { echo "::error::west init failed for ${MANIFEST_FILE}"; exit 1; }
+
+          update_with() {
+            local mf="$1"
+            local retries="$2"
+            west config manifest.file "${mf}"
+            for attempt in $(seq 1 "${retries}"); do
+              echo "::group::west update (${mf}, attempt ${attempt}/${retries})"
+              if west update -n; then
+                echo "::endgroup::"
+                return 0
+              fi
+              echo "::endgroup::"
+              if [ "${attempt}" -lt "${retries}" ]; then
+                echo "::warning::west update failed (${mf}, attempt ${attempt}/${retries}), retrying in 20s"
+                sleep 20
+              fi
+            done
+            return 1
+          }
+
+          # Rate limits, TLS/TCP breakage and DNS are network-plausible reasons
+          # to try the mirror. Authentication or 404 failures are not: the
+          # mirror would fail exactly the same way, so let those surface.
+          is_network_failure() {
+            grep -qE "HTTP 429|GnuTLS recv error|early EOF|Could not resolve|Failed to connect|Connection (reset by peer|timed out|refused)|Operation timed out|remote end hung up|index-pack failed" "$1"
+          }
+
+          LOG="$(mktemp -p "${RUNNER_TEMP}")"
+          if update_with "${MANIFEST_FILE}" "${RETRIES}" 2>&1 | tee "${LOG}"; then
+            echo "USED_FALLBACK=false" >> "${GITHUB_ENV}"
+            exit 0
+          fi
+
+          if [ -n "${FALLBACK_MANIFEST}" ] && is_network_failure "${LOG}"; then
+            echo "::warning::gitee fetch failed (${MANIFEST_FILE}); retrying against GitHub mirror (${FALLBACK_MANIFEST})"
+            if update_with "${FALLBACK_MANIFEST}" "${FALLBACK_RETRIES}"; then
+              echo "USED_FALLBACK=true" >> "${GITHUB_ENV}"
               exit 0
             fi
-            if [ "${attempt}" -lt 3 ]; then
-              echo "::warning::west update failed (attempt ${attempt}/3), retrying in 30s"
-              sleep 30
-            fi
-          done
-          echo "::error::west update failed after 3 attempts"
+          fi
+
+          echo "::error::west update failed for ${MANIFEST_FILE}"
           exit 1
 
       - name: Record verified revisions
@@ -124,8 +183,14 @@ jobs:
       # Package a ready-to-submit lock only after the floating build passes.
       # GitHub never commits it: the local promotion script validates this
       # package and submits the resulting change through Gerrit.
+      #
+      # Guard with USED_FALLBACK: a build verified against the GitHub mirror
+      # (during a Gitee outage/rate-limit) proves the revision set compiles but
+      # must not become the Gitee release lock, because the frozen manifest it
+      # would be written from carries GitHub URLs. Such a run still reports
+      # drift; promotion waits until the Gitee path is healthy again.
       - name: Package lock promotion
-        if: matrix.track == 'floating' && success()
+        if: matrix.track == 'floating' && success() && env.USED_FALLBACK != 'true'
         env:
           PROMOTION_DIR: ${{ github.workspace }}/promotion
           PROMOTION_LOCK: ${{ github.workspace }}/promotion/rtl8773e-dashboard-gitee.lock.yml
@@ -177,7 +242,7 @@ jobs:
           PY
 
       - name: Upload lock promotion
-        if: matrix.track == 'floating' && success()
+        if: matrix.track == 'floating' && success() && env.USED_FALLBACK != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: dashboard-lock-promotion-${{ github.run_id }}
@@ -190,6 +255,14 @@ jobs:
         run: |
           {
             echo "## Track: \`${{ matrix.track }}\` (\`${{ matrix.manifest }}\`)"
+            if [ "${USED_FALLBACK}" = "true" ]; then
+              if [ "${{ matrix.track }}" = "floating" ]; then
+                echo "_Validated against the GitHub mirror after a Gitee fetch failure._"
+                echo "_Promotion suppressed: a fallback build does not produce a release lock._"
+              else
+                echo "_Gitee fetch failed; verified against the GitHub mirror instead._"
+              fi
+            fi
             echo
             summary="$(find "${REPORT_DIR}" -name summary.md -type f -print -quit 2>/dev/null || true)"
             if [ -n "${summary}" ]; then
@@ -211,7 +284,7 @@ jobs:
       # leaves the locked manifest exactly where it was, which is the whole
       # point: the escape hatch never regresses.
       - name: Announce promotion candidate
-        if: matrix.track == 'floating' && success()
+        if: matrix.track == 'floating' && success() && env.USED_FALLBACK != 'true'
         run: |
           {
             echo
