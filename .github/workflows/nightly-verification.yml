@@ -75,16 +75,12 @@ jobs:
         # into a Gitee release lock.
         run: |
           set -o pipefail
+          MANIFEST_DIR="${GITHUB_WORKSPACE}/.manifest"
           MANIFEST_FILE="${{ matrix.manifest }}"
-          # Only the floating (branch-tracking) manifest has a GitHub mirror to
-          # fall back to. The locked manifest is fully SHA-pinned: the same
-          # commits exist on both hosts, so switching its manifest file would
-          # not change anything -- it just retries harder in place.
-          if [ "${{ matrix.track }}" = "floating" ]; then
-            FALLBACK_MANIFEST="${MANIFEST_FILE%-gitee.yml}-github.yml"
-          else
-            FALLBACK_MANIFEST=""
-          fi
+          # Both tracks get a GitHub mirror to fall back to. The floating track
+          # uses the committed mirror manifest; the locked track derives one
+          # (see derive_locked_fallback below).
+          FALLBACK_MANIFEST="${MANIFEST_FILE/-gitee./-github.}"
           # The retry budget has to fit inside the step timeout above: a cold
           # clone of this workspace takes a few minutes, so 4 gitee attempts
           # plus 2 mirror attempts must still finish well under 45 minutes.
@@ -127,21 +123,50 @@ jobs:
             grep -qE "HTTP 429|GnuTLS recv error|early EOF|Could not resolve|Failed to connect|Connection (reset by peer|timed out|refused)|Operation timed out|remote end hung up|index-pack failed" "$1"
           }
 
+          # The locked manifest is fully SHA-pinned and both hosts carry the
+          # same commits, so its mirror manifest differs only in URL host.
+          # Derive it here rather than committing a second lock file: a
+          # generated copy cannot drift out of sync with the Gitee lock, and
+          # promote_lock.py keeps its single-file diff guard.
+          derive_locked_fallback() {
+            local source="${MANIFEST_DIR}/${MANIFEST_FILE}"
+            local target="${MANIFEST_DIR}/${FALLBACK_MANIFEST}"
+            sed 's|https://gitee\.com/|https://github.com/|g' "${source}" > "${target}"
+            # A leftover Gitee URL would quietly re-fetch from the host that
+            # just rate-limited us, making the mirror look broken instead.
+            if grep -qE "^[[:space:]]*url:[[:space:]]*https://gitee\.com" "${target}"; then
+              echo "::error::could not rewrite every Gitee URL into ${FALLBACK_MANIFEST}"
+              return 1
+            fi
+          }
+
           LOG="$(mktemp -p "${RUNNER_TEMP}")"
           if update_with "${MANIFEST_FILE}" "${RETRIES}" 2>&1 | tee "${LOG}"; then
             echo "USED_FALLBACK=false" >> "${GITHUB_ENV}"
             exit 0
           fi
 
-          if [ -n "${FALLBACK_MANIFEST}" ] && is_network_failure "${LOG}"; then
-            echo "::warning::gitee fetch failed (${MANIFEST_FILE}); retrying against GitHub mirror (${FALLBACK_MANIFEST})"
-            if update_with "${FALLBACK_MANIFEST}" "${FALLBACK_RETRIES}"; then
-              echo "USED_FALLBACK=true" >> "${GITHUB_ENV}"
-              exit 0
-            fi
+          if ! is_network_failure "${LOG}"; then
+            echo "INIT_FAILURE_KIND=content" >> "${GITHUB_ENV}"
+            echo "::error::west update failed for ${MANIFEST_FILE}"
+            exit 1
           fi
 
-          echo "::error::west update failed for ${MANIFEST_FILE}"
+          if [ "${{ matrix.track }}" = "locked" ]; then
+            derive_locked_fallback || exit 1
+          fi
+
+          echo "::warning::gitee fetch failed (${MANIFEST_FILE}); retrying against GitHub mirror (${FALLBACK_MANIFEST})"
+          if update_with "${FALLBACK_MANIFEST}" "${FALLBACK_RETRIES}"; then
+            echo "USED_FALLBACK=true" >> "${GITHUB_ENV}"
+            exit 0
+          fi
+
+          # Neither host would serve the revisions. Record that this was a fetch
+          # failure so the locked-track error below does not blame the snapshot
+          # for what is really a connectivity problem.
+          echo "INIT_FAILURE_KIND=network" >> "${GITHUB_ENV}"
+          echo "::error::west update failed for ${MANIFEST_FILE} and ${FALLBACK_MANIFEST}"
           exit 1
 
       - name: Record verified revisions
@@ -303,10 +328,17 @@ jobs:
             echo '```'
           } >> "${GITHUB_STEP_SUMMARY}"
 
+      # A fetch that never reached the compiler proves nothing about the
+      # snapshot. Keep the urgent "escape hatch is gone" wording for genuine
+      # breakage so it does not lose its meaning on nights when both hosts flake.
       - name: Flag broken locked manifest
         if: matrix.track == 'locked' && failure()
         run: |
-          echo "::error::The locked manifest no longer builds. The known-good escape hatch is gone; treat this as higher priority than a floating failure (likely an upstream force-push or a dropped object)."
+          if [ "${INIT_FAILURE_KIND}" = "network" ]; then
+            echo "::error::Could not fetch the locked revisions from Gitee or the GitHub mirror. The snapshot is unverified, not proven broken; re-run once the hosts recover."
+          else
+            echo "::error::The locked manifest no longer builds. The known-good escape hatch is gone; treat this as higher priority than a floating failure (likely an upstream force-push or a dropped object)."
+          fi
 
       - name: Upload verification reports
         if: always()
