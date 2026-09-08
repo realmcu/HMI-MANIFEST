@@ -32,6 +32,8 @@
   - [RTL8773G CLAW](#rtl8773g-claw)
   - [RTL8783G z2plus](#rtl8783g-z2plus)
   - [RTL8773G 8189NIC](#rtl8773g-8189nic)
+- [自动测试用 manifest](#自动测试用-manifestautotest)
+  - [RTL8783GBF EVB HoneyGUI](#rtl8783gbf-evb-honeygui)
 - [测试用 manifest](#测试用-manifesttest)
   - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
   - [RTL8773GTP eBadge WH](#rtl8773gtp-ebadge-wh)
@@ -41,6 +43,7 @@
 
 - 根目录：正式发布的项目 manifest
 - `demo/`：Demo / 示例项目的 manifest（如 CLAW、z2plus、8189 NIC 等）
+- `autotest/`：自动化测试专用的 manifest
 - `test/`：开发调试用的临时 manifest（个人分支、评估板验证等，不建议外部用户使用）
 - `scripts/`：发布验证脚本（供 `.github/workflows/` 的 nightly 流程调用）
 
@@ -390,6 +393,57 @@ west update
 cd zephyrproject
 west build -b rtl87x3g_watch/rtl8783gbf realtek-app/applications/wifi_nic_sdio
 ```
+
+---
+
+## 自动测试用 manifest（`autotest/`）
+
+> 该目录下的 manifest 供自动化测试任务拉取固定的项目组合，不建议作为正式项目配置使用。
+
+---
+
+### RTL8783GBF EVB HoneyGUI
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf autotest/rtl8783gbf-evb-honeygui.yml .
+west update
+```
+
+**编译：**（该 manifest 把 app 检出到工作区根目录的 `applications/`，不在 `zephyrproject/` 下）
+```bash
+cd applications
+west build -b rtl87x3g_evb
+```
+
+**下载/烧录：**
+
+> 首次下载、空片或需要更新 runtime 时，先烧录 RTL8783G runtime：
+
+```bash
+cd applications
+CHIP=RTL8783G scripts/flash-runtime-linux.sh /dev/ttyUSB0  # Linux
+```
+
+```bat
+cd applications
+set CHIP=RTL8783G && scripts\flash-runtime-win32.bat COM3  :: Windows
+```
+
+> 然后烧录 App；后续仅更新 App 时直接执行此步骤：
+
+```bash
+cd applications
+scripts/flash-linux-app.sh /dev/ttyUSB0  # Linux
+```
+
+```bat
+cd applications
+scripts\flash-win32-app.bat COM3         :: Windows
+```
+
+请根据实际连接修改 Linux 下载口 `/dev/ttyUSB0` 或 Windows 串口 `COM3`。
 
 ---
 
