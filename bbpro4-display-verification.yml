@@ -19,7 +19,7 @@ manifest:
       - name: gpu
         repo-path: HoneyRepo/gpu
         revision: master
-        path: rtt_project/drivers/gpu/source
+        path: rtt_project/drivers/gpu
 
     self:
         path: .manifest
