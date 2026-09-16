@@ -1,0 +1,25 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+      - name: gitee-ssh
+        url-base: ssh://git@gitee.com
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: rtt-project
+        remote: gitee-ssh
+        repo-path: realmcu/rtt_project
+        revision: master
+        path: rtt_project
+
+      - name: gpu
+        repo-path: HoneyRepo/gpu
+        revision: master
+        path: rtt_project/drivers/gpu/source
+
+    self:
+        path: .manifest
