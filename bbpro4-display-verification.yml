@@ -21,5 +21,15 @@ manifest:
         revision: master
         path: rtt_project/drivers/gpu
 
+      - name: vcdj
+        repo-path: HoneyRepo/driver/display
+        revision: bbpro4/jpeg_png_vc900dj
+        path: rtt_project/drivers/vcdj
+
+      - name: jpu
+        repo-path: HoneyRepo/driver/display
+        revision: bbpro4/jpeg_coda_j12
+        path: rtt_project/drivers/jpu
+
     self:
         path: .manifest
