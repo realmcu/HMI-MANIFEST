@@ -44,7 +44,7 @@ manifest:
 
       - name: hmi
         repo-path: HoneyRepo/hmi
-        revision: RTL8773G-eBadge-WH
+        revision: RTL8773GTP-WATCH-360X360 
         path: applications
 
       - name: watch_ui
