@@ -47,6 +47,12 @@ manifest:
         revision: RTL8773G-eBadge-WH
         path: applications
 
+      - name: watch_ui
+        remote: gitee-ssh
+        repo-path: priodigit/smartwatchui360360
+        revision: master
+        path: ui
+
       - name: hmi-script
         repo-path: HoneyRepo/hmi
         revision: script
