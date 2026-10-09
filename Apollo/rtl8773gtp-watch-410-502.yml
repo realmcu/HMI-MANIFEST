@@ -33,7 +33,7 @@ manifest:
         path: applications
 
       - name: watch_ui
-        remote: gitee-ssh
+        remote: gitee
         repo-path: priodigit/smartwatchui360360
         revision: master
         path: ui
@@ -63,7 +63,7 @@ manifest:
         path: applications/component/FlashDB
 
       - name: gsensor-algorithm
-        remote: gitee-ssh
+        remote: gitee
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
         path: applications/component/gsensor-algorithm
