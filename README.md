@@ -151,6 +151,27 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
 
 ---
 
+### RTL8773G watch
+
+**下载：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf Apollo/rtl8773gtp-watch-410-502.yml .
+west update
+```
+
+**编译：**
+```bash
+py -3.13 -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r zephyrproject\zephyr\scripts\requirements-base.txt
+
+cmake -S applications -B applications\build-venv -G Ninja -DBOARD=rtl87x3g_evb -DPython3_EXECUTABLE="%CD%\.venv\Scripts\python.exe"
+cmake --build applications\build-venv --parallel 8
+```
+
+---
+
 ### RTL8773G RTL8711F eBadge
 
 **内部 Gerrit：**
