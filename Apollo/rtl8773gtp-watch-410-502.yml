@@ -1,49 +1,34 @@
 manifest:
 
     remotes:
-      - name: origin
-        url-base: ssh://cn4soc.rtkbf.com:29418
-      - name: gitee-ssh
+      - name: gitee
         url-base: ssh://git@gitee.com
 
+
     defaults:
-      remote: origin
+      remote: gitee
+
 
     projects:
-      - name: zephyr
-        repo-path: HoneyRepo/zephyr
-        revision: realtek-main-v3.7
-        path: zephyr
-        import:
-            path-prefix: zephyrproject
-            name-allowlist:
-              - cmsis
-              - tinycrypt
-              - mbedtls
-              - fatfs
-
-      - name: hal_realtek
-        repo-path: HoneyRepo/zephyr-hal
+      - name: zephyr-sdk
+        remote: gitee 
+        repo-path: realmcu/rtl87x3g-hmi-sdk
         revision: master
-        path: zephyrproject/modules/hal/realtek
+        path: zephyrproject
 
-      - name: realtek-app
-        repo-path: HoneyRepo/realtek-zephyr-project
+      - name: honeygui
+        remote: gitee
+        repo-path: realmcu/HoneyGUI
         revision: master
-        path: zephyrproject/realtek-app
-
+        path: zephyrproject/modules/honeygui
+        
       - name: display
-        repo-path: HoneyRepo/driver/display
+        repo-path: realmcu/display
         revision: master
         path: zephyrproject/modules/display
 
-      - name: honeygui
-        repo-path: HoneyGUI
-        revision: master
-        path: zephyrproject/modules/honeygui
-
       - name: hmi
-        repo-path: HoneyRepo/hmi
+        repo-path: realmcu/hmi
         revision: RTL8773GTP-WATCH-360X360 
         path: applications
 
@@ -54,22 +39,26 @@ manifest:
         path: ui
 
       - name: hmi-script
-        repo-path: HoneyRepo/hmi
+        remote: gitee
+        repo-path: realmcu/hmi
         revision: script
         path: applications/scripts
 
       - name: rtl87x3-hmi-posix
-        repo-path: HoneyRepo/hmi
+        remote: gitee
+        repo-path: realmcu/hmi
         revision: posix-device
         path: applications/component/posix
 
       - name: rtl87x3-hmi-protocol
-        repo-path: HoneyRepo/hmi
+        remote: gitee
+        repo-path: realmcu/hmi
         revision: rtl87x3-hmi-protocol
         path: applications/component/protocol
 
       - name: FlashDB
-        repo-path: HoneyRepo/hmi
+        remote: gitee
+        repo-path: realmcu/hmi
         revision: FlashDB
         path: applications/component/FlashDB
 
