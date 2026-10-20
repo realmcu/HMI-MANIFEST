@@ -1,0 +1,25 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: honeycomb
+        repo-path: HoneyComb
+        revision: sbee2-sdk-v0
+        path: honeycomb
+        submodules:
+          - path: sdk/src/app/Wearable
+          - path: sdk/src/app/lvgl
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl8762d-lvgl-hmi
+        path: honeycomb/sdk/board/evb_stack_img/lvgl_hmi
+
+    self:
+        path: .manifest

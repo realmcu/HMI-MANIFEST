@@ -28,6 +28,7 @@
   - [RTL8773G Chargebox](#rtl8773g-chargebox)
   - [RTL8783GBF eBadge](#rtl8783gbf-ebadge)
   - [RTL8721F Dashboard](#rtl8721f-dashboard)
+  - [RTL8762D LVGL HMI](#rtl8762d-lvgl-hmi)
 - [Demo 项目 manifest](#demo-项目-manifestdemo)
   - [RTL8773G CLAW](#rtl8773g-claw)
   - [RTL8783G z2plus](#rtl8783g-z2plus)
@@ -359,6 +360,37 @@ ameba.py SOC RTL8721F
 ameba.py menuconfig
 ameba.py build
 ```
+
+---
+
+### RTL8762D LVGL HMI
+
+基于 LVGL v9 的 RTL8762D HMI 工程，包含以下组件：
+
+| 组件 | 内部 Gerrit | Gitee |
+| --- | --- | --- |
+| SDK | `HoneyComb`（`sbee2-sdk-v0`）→ `honeycomb/` | `realmcu/rtl8762d-hmi-sdk`（`master`）→ `sdk/` |
+| Wearable | HoneyComb 子模块 → `honeycomb/sdk/src/app/Wearable` | `realmcu/wearable`（`master`）→ `sdk/src/app/Wearable` |
+| LVGL | HoneyComb 子模块 → `honeycomb/sdk/src/app/lvgl` | `realmcu/lvgl`（`lvgl_v9`）→ `sdk/src/app/lvgl` |
+| HMI 应用 | `HoneyRepo/hmi`（`rtl8762d-lvgl-hmi`）→ `honeycomb/sdk/board/evb_stack_img/lvgl_hmi` | `realmcu/hmi`（`rtl8762d-lvgl-hmi`）→ `sdk/board/evb_stack_img/lvgl` |
+
+**内部 Gerrit：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8762d-lvgl-hmi.yml .
+west update
+```
+
+**Gitee 公开：**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8762d-lvgl-hmi-gitee.yml .
+west update
+```
+
+**Github：** 暂未开源
+
+**编译：** Keil 打开 `sdk/board/evb_stack_img/lvgl/mdk/project.uvprojx` 编译（内部 Gerrit 路径为 `honeycomb/sdk/board/evb_stack_img/lvgl_hmi/mdk/project.uvprojx`，honeycomb 自带的 `evb_stack_img/lvgl` 是旧工程，请勿使用）
 
 ---
 

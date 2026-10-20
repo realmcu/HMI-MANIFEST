@@ -1,0 +1,32 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: https://gitee.com
+
+    defaults:
+      remote: origin
+
+    projects:
+      - name: rtl8762d-hmi-sdk
+        repo-path: realmcu/rtl8762d-hmi-sdk
+        revision: master
+        path: sdk
+
+      - name: wearable
+        repo-path: realmcu/wearable
+        revision: master
+        path: sdk/src/app/Wearable
+
+      - name: lvgl
+        repo-path: realmcu/lvgl
+        revision: lvgl_v9
+        path: sdk/src/app/lvgl
+
+      - name: hmi
+        repo-path: realmcu/hmi
+        revision: rtl8762d-lvgl-hmi
+        path: sdk/board/evb_stack_img/lvgl
+
+    self:
+        path: .manifest
