@@ -10,23 +10,28 @@ manifest:
     projects:
       - name: rtl87x3g-hmi-sdk
         repo-path: realmcu/rtl87x3g-hmi-sdk
-        revision: master
+        revision: a806ed6798b099081d3c86afcbc17ff35d2f3472
         path: zephyrproject
 
       - name: display
         repo-path: realmcu/display
-        revision: master
+        revision: 93b8aa4872f32bd579ea923595f86810a3c9bbc4
         path: zephyrproject/modules/display
 
       - name: honeygui
         repo-path: realmcu/HoneyGUI
-        revision: master
+        revision: 3a9e5a6de57c243f4f23dc3c762240e3ba9405a6
         path: zephyrproject/modules/honeygui
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: rtl8773g-dashboard
+        revision: 0f6e480fb625f6cbc34e3f8458f16e225089b84d
         path: zephyrproject/realtek-app/applications/dashboard
+        
+      - name: honeygui-dashboard-ui
+        repo-path: realmcu/honeygui-template-dashboard
+        revision: 3b0bd8edc9cb6a283270d75039afe02de0eef6d0
+        path: zephyrproject/realtek-app/applications/dashboard/ui_design
 
     self:
         path: .manifest
