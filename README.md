@@ -391,7 +391,7 @@ west update
 
 **GitHub:** not open-sourced yet
 
-**Build:** open `sdk/board/evb_stack_img/lvgl/mdk/project.uvprojx` in Keil and build. On the internal Gerrit layout the path is `honeycomb/sdk/board/evb_stack_img/lvgl_hmi/mdk/project.uvprojx`; the `evb_stack_img/lvgl` project bundled with honeycomb is an older one, so do not use it.
+**Build:** open `sdk/board/evb_stack_img/lvgl/mdk/project.uvprojx` in Keil and build.
 
 ---
 
