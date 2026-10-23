@@ -10,11 +10,6 @@ manifest:
     projects:
       - name: rtl87x3g-hmi-sdk
         repo-path: realmcu/rtl87x3g-hmi-sdk
-        # Stays on master on purpose: the GitHub mirror of this SDK is a
-        # rewritten public release (last updated 2026-08-10) whose history
-        # does not contain the commits Gitee's master points at, so it has
-        # no equivalent SHA to pin. The other projects share commits across
-        # both hosts and are pinned below.
         revision: master
         path: zephyrproject
 
