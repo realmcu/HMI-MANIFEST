@@ -30,7 +30,7 @@ manifest:
 
       - name: honeygui-dashboard-ui
         repo-path: realmcu/honeygui-template-dashboard
-        revision: 3b0bd8edc9cb6a283270d75039afe02de0eef6d0
+        revision: edd82a63f276df7e4cf758f2b1a6d545e02a01e8
         path: zephyrproject/realtek-app/applications/dashboard/ui_design
 
     self:
