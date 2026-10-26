@@ -25,7 +25,7 @@ manifest:
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: 0f6e480fb625f6cbc34e3f8458f16e225089b84d
+        revision: 749fbb323e883a7c5c7f6c17592ae26f79fcd9fd
         path: zephyrproject/realtek-app/applications/dashboard
 
       - name: honeygui-dashboard-ui
