@@ -15,7 +15,7 @@ manifest:
 
       - name: display
         repo-path: realmcu/display
-        revision: 93b8aa4872f32bd579ea923595f86810a3c9bbc4
+        revision: f26d611eb42c98d73265f595abfbf950a63b0760
         path: zephyrproject/modules/display
 
       - name: honeygui
@@ -25,7 +25,7 @@ manifest:
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: 749fbb323e883a7c5c7f6c17592ae26f79fcd9fd
+        revision: 48f0fe7413d2b1c10fce713cbd149e693975b828
         path: zephyrproject/realtek-app/applications/dashboard
 
       - name: honeygui-dashboard-ui
