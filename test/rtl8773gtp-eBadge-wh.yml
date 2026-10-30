@@ -5,6 +5,8 @@ manifest:
         url-base: ssh://cn4soc.rtkbf.com:29418
       - name: gitee-ssh
         url-base: ssh://git@gitee.com
+      - name: gitee
+        url-base: ssh://git@gitee.com
 
     defaults:
       remote: origin
@@ -55,23 +57,29 @@ manifest:
       - name: rtl87x3-hmi-posix
         repo-path: HoneyRepo/hmi
         revision: posix-device
-        path: applications/component/posix
+        path: posix
 
       - name: rtl87x3-hmi-protocol
         repo-path: HoneyRepo/hmi
         revision: rtl87x3-hmi-protocol
-        path: applications/component/protocol
+        path: protocol
 
       - name: FlashDB
         repo-path: HoneyRepo/hmi
         revision: FlashDB
-        path: applications/component/FlashDB
+        path: FlashDB
 
       - name: gsensor-algorithm
         remote: gitee-ssh
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
-        path: applications/component/gsensor-algorithm
+        path: gsensor-algorithm
+
+      - name: watch_ui
+        remote: gitee
+        repo-path: priodigit/smartwatchui360360
+        revision: master
+        path: ui
 
 
     self:

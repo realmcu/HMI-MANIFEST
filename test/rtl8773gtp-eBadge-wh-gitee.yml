@@ -36,22 +36,22 @@ manifest:
       - name: rtl87x3-hmi-posix
         repo-path: realmcu/hmi
         revision: posix-device
-        path: applications/component/posix
+        path: posix
 
       - name: rtl87x3-hmi-protocol
         repo-path: realmcu/hmi
         revision: rtl87x3-hmi-protocol
-        path: applications/component/protocol
+        path: protocol
 
       - name: FlashDB
         repo-path: realmcu/hmi
         revision: FlashDB
-        path: applications/component/FlashDB
+        path: FlashDB
 
       - name: gsensor-algorithm
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
-        path: applications/component/gsensor-algorithm
+        path: gsensor-algorithm
 
 
     self:
