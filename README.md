@@ -16,6 +16,8 @@ Accordingly, every open-sourced project provides up to three manifests:
 
 ## Table of contents
 
+- [Prerequisites](#prerequisites)
+- [Project maturity](#project-maturity)
 - [Repository layout](#repository-layout)
 - [Production manifests](#production-manifests)
   - [RTL8773E Dashboard](#rtl8773e-dashboard)
@@ -40,6 +42,39 @@ Accordingly, every open-sourced project provides up to three manifests:
   - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
   - [RTL8773GTP eBadge WH](#rtl8773gtp-ebadge-wh)
   - [RTL87X3G Mijia](#rtl87x3g-mijia)
+- [Reporting problems](#reporting-problems)
+
+## Prerequisites
+
+| Tool | Version | Check |
+| --- | --- | --- |
+| `git` | ≥ 2.20 | `git --version` |
+| `python3` | ≥ 3.8 | `python3 --version` |
+| `west` | ≥ 1.2 | `west --version` |
+
+The commands below clone over SSH, so an SSH key must be registered with your hosting service
+beforehand. If you have not set one up, use the HTTPS address of the same repository instead.
+
+## Project maturity
+
+| Project | Maturity |
+| --- | --- |
+| RTL8773E Dashboard | Released |
+| RTL8773G Smarthome | Released |
+| RTL8773G Dashboard | Released |
+| RTL8773G Chargebox | Released |
+| RTL8773G + RTL8711F eBadge | In development |
+| RTL8721F Dashboard | In development |
+| RTL8762D LVGL HMI | In development |
+| RTL8773E eBadge | Internal use |
+| RTL8773G eBadge | Internal use |
+| RTL8783GBF eBadge | Internal use |
+| RTL8773G Watch | Internal use |
+| RTL8773G Deskmate | Internal use |
+
+Manifests are published for the projects above so the sources and their history are available.
+A project listed as in development or for internal use is not a released product, and its manifest
+may change without notice.
 
 ## Repository layout
 
@@ -47,7 +82,7 @@ Accordingly, every open-sourced project provides up to three manifests:
 - `demo/`: manifests for demo and sample projects (CLAW, z2plus, 8189 NIC, etc.)
 - `autotest/`: manifests used only by automated tests
 - `test/`: temporary manifests for development and debugging (personal branches, EVB bring-up, etc.); not recommended for external users
-- `scripts/`: release verification scripts, invoked by the nightly workflow under `.github/workflows/`
+- `scripts/`: release verification scripts
 
 > When using these files, pass the matching relative path to `--mf`, for example `--mf demo/rtl8773g-claw.yml`.
 
@@ -56,6 +91,9 @@ Accordingly, every open-sourced project provides up to three manifests:
 ---
 
 ### RTL8773E Dashboard
+
+HMI dashboard application for the RTL8773E: an instrument-cluster display with GUI, OTA updates and
+a designer-based UI.
 
 **Internal Gerrit:**
 ```bash
@@ -84,6 +122,8 @@ west update
 
 ### RTL8773E eBadge
 
+Electronic badge application for the RTL8773E.
+
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -111,6 +151,8 @@ west update
 
 ### RTL8773G Deskmate
 
+Desktop companion device application for the RTL8773G.
+
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -128,6 +170,8 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/deskmate
 ---
 
 ### RTL8773G eBadge
+
+Electronic badge application for the RTL8773G.
 
 **Internal Gerrit:**
 ```bash
@@ -155,6 +199,8 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
 
 ### RTL8773G Watch
 
+Smartwatch application for the RTL8773G, with a round 360×360 display.
+
 **Fetch the sources:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -175,6 +221,8 @@ cmake --build applications\build-venv --parallel 8
 ---
 
 ### RTL8773G + RTL8711F eBadge
+
+Electronic badge application combining the RTL8773G and the RTL8711F for the wireless link.
 
 **Internal Gerrit:**
 ```bash
@@ -201,6 +249,9 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g_8711f
 ---
 
 ### RTL8773G Smarthome
+
+Smart-home control panel application for the RTL8773G.
+
 
 **Internal Gerrit:**
 ```bash
@@ -232,6 +283,8 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/smarthome
 
 ### RTL8773G Dashboard
 
+HMI dashboard application for the RTL8773G.
+
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -261,6 +314,8 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/dashboard
 ---
 
 ### RTL8773G Chargebox
+
+Charging-case application for the RTL8773G.
 
 **Internal Gerrit:**
 ```bash
@@ -292,6 +347,8 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/chargebox
 
 ### RTL8783GBF eBadge
 
+Electronic badge application for the RTL8783GBF.
+
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -322,6 +379,8 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge
 ---
 
 ### RTL8721F Dashboard
+
+Dashboard application for the RTL8721F on the Ameba platform, with the UI in HoneyGUI.
 
 **Internal Gerrit:**
 ```bash
@@ -366,7 +425,7 @@ ameba.py build
 
 ### RTL8762D LVGL HMI
 
-An RTL8762D HMI project built on LVGL v9, made up of the following components:
+An RTL8762D HMI project built on LVGL v9. Made up of the following components:
 
 | Component | Internal Gerrit | Gitee |
 | --- | --- | --- |
@@ -543,7 +602,7 @@ west update
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773gtp-eBadge-wh-gitee.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773gtp-eBadge-wh.yml .
 west update
 ```
 
@@ -591,3 +650,8 @@ west build -b rtl87x3g_evb realtek-app/applications/mijia
 ---
 
 > Note: when you use a Gitee or GitHub manifest, the repository layout differs from the internal one (the SDK lives under `sdk/` or `RTL8773EP/`, for example). The `path` field in the matching `*-gitee.yml` is authoritative.
+
+## Reporting problems
+
+Please include the manifest name, the exact command you ran, the failing project from `west update`,
+and the first build error.
