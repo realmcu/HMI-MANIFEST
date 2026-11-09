@@ -35,8 +35,10 @@ from bump_lock import LockError, ensure_pinned, ensure_same_project_set, parse_p
 DEFAULT_REPOSITORY = "realmcu/HMI-MANIFEST"
 DEFAULT_WORKFLOW = "nightly-verification.yml"
 ARTIFACT_PREFIX = "dashboard-lock-promotion-"
-LOCK_NAME = "rtl8773e-dashboard-gitee.lock.yml"
-FLOATING_NAME = "rtl8773e-dashboard-gitee.yml"
+LOCK_PATH = "dashboard/rtl8773e-dashboard-gitee.lock.yml"
+FLOATING_PATH = "dashboard/rtl8773e-dashboard-gitee.yml"
+LOCK_NAME = Path(LOCK_PATH).name
+FLOATING_NAME = Path(FLOATING_PATH).name
 METADATA_NAME = "promotion-metadata.json"
 REPORT_NAME = "promotion-report.md"
 STATE_NAME = "lock-promotion-state.json"
@@ -474,15 +476,15 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
         "--porcelain",
         "--untracked-files=all",
         "--",
-        LOCK_NAME,
+        LOCK_PATH,
     )
     if lock_status:
         raise PromotionError(
-            f"{LOCK_NAME} already has local changes; review or discard them before prepare"
+            f"{LOCK_PATH} already has local changes; review or discard them before prepare"
         )
 
-    floating_path = manifest_repo / FLOATING_NAME
-    target_lock = manifest_repo / LOCK_NAME
+    floating_path = manifest_repo / FLOATING_PATH
+    target_lock = manifest_repo / LOCK_PATH
     if not floating_path.is_file() or not target_lock.is_file():
         raise PromotionError("Run this script from the manifest repository checkout")
 
@@ -530,7 +532,7 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
 
         target_lock.write_bytes(package.lock_path.read_bytes())
         lock_written = True
-        ensure_expected_diff(manifest_repo, LOCK_NAME)
+        ensure_expected_diff(manifest_repo, LOCK_PATH)
         state = {
             "schema_version": 2,
             "phase": "prepared",
@@ -548,12 +550,12 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
         print(f"Build: {state['run_url']}")
         print(f"Updated: {target_lock}")
         print("\nReview before submitting:")
-        print(f"  git diff -- {LOCK_NAME}")
+        print(f"  git diff -- {LOCK_PATH}")
         print(f"  python {Path(__file__).resolve()} submit")
         return 0
     except Exception:
         if lock_written:
-            git(manifest_repo, "checkout", "--", LOCK_NAME, check=False)
+            git(manifest_repo, "checkout", "--", LOCK_PATH, check=False)
         if pending_state.exists():
             pending_state.unlink()
         raise
@@ -618,7 +620,7 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
             f"{branch or 'DETACHED'}"
         )
 
-    target_lock = manifest_repo / LOCK_NAME
+    target_lock = manifest_repo / LOCK_PATH
     if sha256(target_lock) != state["lock_sha256"]:
         raise PromotionError(
             "The prepared lock changed after validation; rerun prepare instead of submitting"
@@ -627,7 +629,7 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
     if state["phase"] == "prepared":
         if git(manifest_repo, "rev-parse", "HEAD") != state["base"]:
             raise PromotionError("HEAD moved after prepare; rerun prepare on the new base")
-        ensure_expected_diff(manifest_repo, LOCK_NAME)
+        ensure_expected_diff(manifest_repo, LOCK_PATH)
         hook = common_git_dir(manifest_repo) / "hooks" / "commit-msg"
         if not hook.is_file():
             raise PromotionError(
@@ -645,7 +647,7 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
             "-m",
             body,
             "--",
-            LOCK_NAME,
+            LOCK_PATH,
         )
         commit = git(manifest_repo, "rev-parse", "HEAD")
         message = git(manifest_repo, "log", "-1", "--format=%B")
@@ -662,7 +664,7 @@ def submit(_args: argparse.Namespace, manifest_repo: Path) -> int:
         commit = state["commit"]
         if git(manifest_repo, "rev-parse", "HEAD") != commit:
             raise PromotionError("HEAD no longer matches the promotion commit")
-        if git(manifest_repo, "status", "--porcelain", "--", LOCK_NAME):
+        if git(manifest_repo, "status", "--porcelain", "--", LOCK_PATH):
             raise PromotionError("The lock changed after the promotion commit was created")
 
     remote_url = git(manifest_repo, "remote", "get-url", "gerrit")
@@ -706,7 +708,7 @@ def abort(_args: argparse.Namespace, manifest_repo: Path) -> int:
     validate_state(state)
     if state["phase"] != "prepared":
         raise PromotionError("The promotion is already committed; abort it with git manually")
-    target_lock = manifest_repo / LOCK_NAME
+    target_lock = manifest_repo / LOCK_PATH
     if sha256(target_lock) != state["lock_sha256"]:
         raise PromotionError("The prepared lock changed; refusing to discard it")
     git(
@@ -716,10 +718,10 @@ def abort(_args: argparse.Namespace, manifest_repo: Path) -> int:
         "--staged",
         "--worktree",
         "--",
-        LOCK_NAME,
+        LOCK_PATH,
     )
     path.unlink()
-    print(f"Discarded the prepared update to {LOCK_NAME}.")
+    print(f"Discarded the prepared update to {LOCK_PATH}.")
     return 0
 
 

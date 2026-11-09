@@ -78,13 +78,22 @@ may change without notice.
 
 ## Repository layout
 
-- Repository root: manifests for officially released projects
+- `ebadge/`: eBadge manifests grouped by chip family
+- `dashboard/`: dashboard manifests grouped by chip family
+- `watch/`: watch manifests
+- `deskmate/`: deskmate manifests
+- `smarthome/`: smart-home manifests
+- `chargebox/`: charging-case manifests
+- `lvgl/`: LVGL HMI manifests
 - `demo/`: manifests for demo and sample projects (CLAW, z2plus, 8189 NIC, etc.)
 - `autotest/`: manifests used only by automated tests
 - `test/`: temporary manifests for development and debugging (personal branches, EVB bring-up, etc.); not recommended for external users
 - `scripts/`: release verification scripts
 
-> When using these files, pass the matching relative path to `--mf`, for example `--mf demo/rtl8773g-claw.yml`.
+Product directories use lowercase names. Every manifest has an explicit source suffix such as
+`-gerrit`, `-gitee`, or `-github`; channel variants are not separate directories.
+
+> When using these files, pass the matching relative path to `--mf`, for example `--mf demo/rtl8773g-claw-gerrit.yml`.
 
 ## Production manifests
 
@@ -98,21 +107,21 @@ a designer-based UI.
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773e-dashboard.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf dashboard/rtl8773e-dashboard-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773e-dashboard-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773e-dashboard-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-dashboard-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773e-dashboard-github.yml .
 west update
 ```
 
@@ -127,21 +136,21 @@ Electronic badge application for the RTL8773E.
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773e-eBadge.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773e-ebadge-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773e-eBadge-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773e-ebadge-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773e-eBadge-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8773e-ebadge-github.yml .
 west update
 ```
 
@@ -156,7 +165,7 @@ Desktop companion device application for the RTL8773G.
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-deskmate.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf deskmate/rtl8773g-deskmate-gerrit.yml .
 west update
 ```
 
@@ -176,14 +185,14 @@ Electronic badge application for the RTL8773G.
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-eBadge.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-ebadge-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-eBadge-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-ebadge-gitee.yml .
 west update
 ```
 
@@ -201,10 +210,17 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
 
 Smartwatch application for the RTL8773G, with a round 360×360 display.
 
-**Fetch the sources:**
+**Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf Apollo/rtl8773gtp-watch-410-502.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf watch/rtl8773gtp-watch-360360-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf watch/rtl8773gtp-watch-360360-gitee.yml .
 west update
 ```
 
@@ -227,14 +243,14 @@ Electronic badge application combining the RTL8773G and the RTL8711F for the wir
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-rtl8711f-eBadge.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-rtl8711f-eBadge-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gitee.yml .
 west update
 ```
 
@@ -253,24 +269,19 @@ west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g_8711f
 Smart-home control panel application for the RTL8773G.
 
 
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-hmi.yml .
-west update
-```
+**Internal Gerrit:** no standalone internal manifest is currently provided.
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-smarthome-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf smarthome/rtl8773g-smarthome-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-smarthome-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf smarthome/rtl8773g-smarthome-github.yml .
 west update
 ```
 
@@ -285,24 +296,19 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/smarthome
 
 HMI dashboard application for the RTL8773G.
 
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-hmi.yml .
-west update
-```
+**Internal Gerrit:** no standalone internal manifest is currently provided.
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-dashboard-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773g-dashboard-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-dashboard-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773g-dashboard-github.yml .
 west update
 ```
 
@@ -317,24 +323,19 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/dashboard
 
 Charging-case application for the RTL8773G.
 
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8773g-hmi.yml .
-west update
-```
+**Internal Gerrit:** no standalone internal manifest is currently provided.
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8773g-chargebox-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf chargebox/rtl8773g-chargebox-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8773g-chargebox-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf chargebox/rtl8773g-chargebox-github.yml .
 west update
 ```
 
@@ -352,21 +353,21 @@ Electronic badge application for the RTL8783GBF.
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8783gbf-eBadge.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8783gbf-ebadge-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8783gbf-eBadge-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8783gbf-ebadge-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8783gbf-eBadge-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8783gbf-ebadge-github.yml .
 west update
 ```
 
@@ -385,21 +386,21 @@ Dashboard application for the RTL8721F on the Ameba platform, with the UI in Hon
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8721f-dashboard.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf dashboard/rtl8721f-dashboard-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8721f-dashboard-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8721f-dashboard-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf rtl8721f-dashboard-github.yml .
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8721f-dashboard-github.yml .
 west update
 ```
 
@@ -437,14 +438,14 @@ An RTL8762D HMI project built on LVGL v9. Made up of the following components:
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl8762d-lvgl-hmi.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf lvgl/rtl8762d-lvgl-hmi-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl8762d-lvgl-hmi-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf lvgl/rtl8762d-lvgl-hmi-gitee.yml .
 west update
 ```
 
@@ -463,7 +464,7 @@ west update
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8773g-claw.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8773g-claw-gerrit.yml .
 west update
 ```
 
@@ -480,7 +481,7 @@ west build -b rtl87x3g_watch/rtl8783gbf realtek-app/applications/claw/RustMcuCla
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8783g-z2plus.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8783g-z2plus-gerrit.yml .
 west update
 ```
 
@@ -497,7 +498,7 @@ west build -s realtek-app/applications/z2plusTCPUDP -b rtl87x3g_watch/rtl8783gbf
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8773g-8189.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf demo/rtl8773g-8189-gerrit.yml .
 west update
 ```
 
@@ -520,7 +521,7 @@ west build -b rtl87x3g_watch/rtl8783gbf realtek-app/applications/wifi_nic_sdio
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf autotest/rtl8783gbf-evb-honeygui.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf autotest/rtl8783gbf-evb-honeygui-gerrit.yml .
 west update
 ```
 
@@ -571,7 +572,7 @@ Adjust the Linux port `/dev/ttyUSB0` or the Windows COM port `COM3` to match you
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8783gbf-evb-wh.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8783gbf-evb-wh-gerrit.yml .
 west update
 ```
 
@@ -588,23 +589,18 @@ west build -b rtl87x3g_evb
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773gtp-eBadge-wh.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773gtp-ebadge-wh-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773gtp-eBadge-wh-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773gtp-ebadge-wh-gitee.yml .
 west update
 ```
 
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf test/rtl8773gtp-eBadge-wh.yml .
-west update
-```
+**GitHub:** not provided for this test manifest.
 
 **Build:** (this manifest checks the app out to `applications/` at the workspace root, not under `zephyrproject/`)
 ```bash
@@ -637,7 +633,7 @@ scripts/flash-linux-app.sh /dev/ttyUSB0    # Linux
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl87x3g-mijia.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl87x3g-mijia-gerrit.yml .
 west update
 ```
 

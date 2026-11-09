@@ -30,15 +30,15 @@ jobs:
       matrix:
         include:
           - track: floating
-            manifest: rtl8773e-dashboard-gitee.yml
+            manifest: dashboard/rtl8773e-dashboard-gitee.yml
           - track: locked
-            manifest: rtl8773e-dashboard-gitee.lock.yml
+            manifest: dashboard/rtl8773e-dashboard-gitee.lock.yml
 
     env:
       WORKSPACE_DIR: ${{ github.workspace }}
       REPORT_DIR: ${{ github.workspace }}/reports
-      LOCK_FILE: ${{ github.workspace }}/.manifest/rtl8773e-dashboard-gitee.lock.yml
-      FLOATING_FILE: ${{ github.workspace }}/.manifest/rtl8773e-dashboard-gitee.yml
+      LOCK_FILE: ${{ github.workspace }}/.manifest/dashboard/rtl8773e-dashboard-gitee.lock.yml
+      FLOATING_FILE: ${{ github.workspace }}/.manifest/dashboard/rtl8773e-dashboard-gitee.yml
       CANDIDATE_FILE: ${{ github.workspace }}/manifest-revisions.yml
 
     steps:

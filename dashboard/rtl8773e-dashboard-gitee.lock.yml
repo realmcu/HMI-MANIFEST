@@ -11,7 +11,7 @@
 #
 # Usage:
 #   west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master \
-#             --mf rtl8773e-dashboard-gitee.lock.yml .
+#             --mf dashboard/rtl8773e-dashboard-gitee.lock.yml .
 #   west update
 #
 # verified: GitHub Actions run 33337631824 https://github.com/realmcu/HMI-MANIFEST/actions/runs/33337631824

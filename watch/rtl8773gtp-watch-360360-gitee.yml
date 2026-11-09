@@ -4,69 +4,59 @@ manifest:
       - name: gitee
         url-base: ssh://git@gitee.com
 
-
     defaults:
       remote: gitee
 
-
     projects:
-      - name: zephyr-sdk
-        remote: gitee 
+      - name: rtl87x3g-hmi-sdk
         repo-path: realmcu/rtl87x3g-hmi-sdk
         revision: master
         path: zephyrproject
 
-      - name: honeygui
-        remote: gitee
-        repo-path: realmcu/HoneyGUI
-        revision: master
-        path: zephyrproject/modules/honeygui
-        
       - name: display
         repo-path: realmcu/display
         revision: master
         path: zephyrproject/modules/display
 
+      - name: honeygui
+        repo-path: realmcu/HoneyGUI
+        revision: master
+        path: zephyrproject/modules/honeygui
+
       - name: hmi
         repo-path: realmcu/hmi
-        revision: RTL8773GTP-WATCH-360X360 
+        revision: RTL8773GTP-WATCH-360X360
         path: applications
 
-      - name: watch_ui
-        remote: gitee
-        repo-path: priodigit/smartwatchui360360
-        revision: master
-        path: ui
-
       - name: hmi-script
-        remote: gitee
         repo-path: realmcu/hmi
         revision: script
         path: applications/scripts
 
       - name: rtl87x3-hmi-posix
-        remote: gitee
         repo-path: realmcu/hmi
         revision: posix-device
-        path: applications/component/posix
+        path: posix
 
       - name: rtl87x3-hmi-protocol
-        remote: gitee
         repo-path: realmcu/hmi
         revision: rtl87x3-hmi-protocol
-        path: applications/component/protocol
+        path: protocol
 
       - name: FlashDB
-        remote: gitee
         repo-path: realmcu/hmi
         revision: FlashDB
-        path: applications/component/FlashDB
+        path: FlashDB
 
       - name: gsensor-algorithm
-        remote: gitee
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
-        path: applications/component/gsensor-algorithm
+        path: gsensor-algorithm
+
+      - name: watch_ui
+        repo-path: priodigit/smartwatchui360360
+        revision: master
+        path: ui
 
 
     self:

@@ -3,6 +3,10 @@ manifest:
     remotes:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
+      - name: gitee-ssh
+        url-base: ssh://git@gitee.com
+      - name: gitee
+        url-base: ssh://git@gitee.com
 
     defaults:
       remote: origin
@@ -22,7 +26,7 @@ manifest:
 
       - name: hal_realtek
         repo-path: HoneyRepo/zephyr-hal
-        revision: master
+        revision: 22ec785bc83800e73ca047b551891eaaaf333d77
         path: zephyrproject/modules/hal/realtek
 
       - name: realtek-app
@@ -35,30 +39,48 @@ manifest:
         revision: master
         path: zephyrproject/modules/display
 
-      - name: lvgl
-        repo-path: HoneyRepo/lvgl
-        revision: lvgl_v9
-        path: zephyrproject/modules/lvgl
-
       - name: honeygui
         repo-path: HoneyGUI
         revision: master
         path: zephyrproject/modules/honeygui
 
-      - name: hmi-smarthome
+      - name: hmi
         repo-path: HoneyRepo/hmi
-        revision: rtl8773g-smarthome
-        path: zephyrproject/realtek-app/applications/smarthome
+        revision: RTL8773GTP-WATCH-360X360
+        path: applications
 
-      - name: hmi-dashboard
+      - name: hmi-script
         repo-path: HoneyRepo/hmi
-        revision: rtl8773g-dashboard
-        path: zephyrproject/realtek-app/applications/dashboard
+        revision: script
+        path: applications/scripts
 
-      - name: hmi-chargebox
+      - name: rtl87x3-hmi-posix
         repo-path: HoneyRepo/hmi
-        revision: rtl8773g-chargebox
-        path: zephyrproject/realtek-app/applications/chargebox
+        revision: posix-device
+        path: posix
+
+      - name: rtl87x3-hmi-protocol
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x3-hmi-protocol
+        path: protocol
+
+      - name: FlashDB
+        repo-path: HoneyRepo/hmi
+        revision: FlashDB
+        path: FlashDB
+
+      - name: gsensor-algorithm
+        remote: gitee-ssh
+        repo-path: realmcu_admin/gsensor-algorithm
+        revision: master
+        path: gsensor-algorithm
+
+      - name: watch_ui
+        remote: gitee
+        repo-path: priodigit/smartwatchui360360
+        revision: master
+        path: ui
+
 
     self:
         path: .manifest
