@@ -25,7 +25,7 @@ manifest:
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: RTL8773GTP-WATCH-360X360
+        revision: RTL8773G-eBadge-WH
         path: applications
 
       - name: hmi-script
