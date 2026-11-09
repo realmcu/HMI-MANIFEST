@@ -26,7 +26,9 @@ manifest:
 
       - name: hal_realtek
         repo-path: HoneyRepo/zephyr-hal
-        revision: master
+        # 22ec785 is the last known-good package before the 2026-11-02 HAL
+        # update started tripping the ROM memory_watch_enable() debug event.
+        revision: 22ec785bc83800e73ca047b551891eaaaf333d77
         path: zephyrproject/modules/hal/realtek
 
       - name: realtek-app
