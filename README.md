@@ -10,7 +10,7 @@ The repository is hosted in three locations, kept in sync:
 
 Accordingly, every open-sourced project provides up to three manifests:
 
-- `<project>.yml`: points at the internal Gerrit repositories
+- `<project>-gerrit.yml`: points at the internal Gerrit repositories
 - `<project>-gitee.yml`: points at the public Gitee repositories (only for some projects)
 - `<project>-github.yml`: points at the public GitHub repositories (only for some projects)
 
@@ -19,18 +19,21 @@ Accordingly, every open-sourced project provides up to three manifests:
 - [Prerequisites](#prerequisites)
 - [Project maturity](#project-maturity)
 - [Repository layout](#repository-layout)
-- [Production manifests](#production-manifests)
+- [Watch](#watch)
+  - [RTL8773GTP Watch 360360](#rtl8773gtp-watch-360360)
+- [Dashboard](#dashboard)
   - [RTL8773E Dashboard](#rtl8773e-dashboard)
-  - [RTL8773E eBadge](#rtl8773e-ebadge)
-  - [RTL8773G Deskmate](#rtl8773g-deskmate)
-  - [RTL8773G eBadge](#rtl8773g-ebadge)
-  - [RTL8773G Watch](#rtl8773g-watch)
-  - [RTL8773G + RTL8711F eBadge](#rtl8773g--rtl8711f-ebadge)
-  - [RTL8773G Smarthome](#rtl8773g-smarthome)
   - [RTL8773G Dashboard](#rtl8773g-dashboard)
-  - [RTL8773G Chargebox](#rtl8773g-chargebox)
-  - [RTL8783GBF eBadge](#rtl8783gbf-ebadge)
   - [RTL8721F Dashboard](#rtl8721f-dashboard)
+- [eBadge](#ebadge)
+  - [RTL8773E eBadge](#rtl8773e-ebadge)
+  - [RTL8773G eBadge](#rtl8773g-ebadge)
+  - [RTL8773G + RTL8711F eBadge](#rtl8773g--rtl8711f-ebadge)
+  - [RTL8783GBF eBadge](#rtl8783gbf-ebadge)
+- [Other products](#other-products)
+  - [RTL8773G Deskmate](#rtl8773g-deskmate)
+  - [RTL8773G Smarthome](#rtl8773g-smarthome)
+  - [RTL8773G Chargebox](#rtl8773g-chargebox)
   - [RTL8762D LVGL HMI](#rtl8762d-lvgl-hmi)
 - [Demo manifests (`demo/`)](#demo-manifests-demo)
   - [RTL8773G CLAW](#rtl8773g-claw)
@@ -69,7 +72,7 @@ beforehand. If you have not set one up, use the HTTPS address of the same reposi
 | RTL8773E eBadge | Internal use |
 | RTL8773G eBadge | Internal use |
 | RTL8783GBF eBadge | Internal use |
-| RTL8773G Watch | Internal use |
+| RTL8773GTP Watch 360360 | Internal use |
 | RTL8773G Deskmate | Internal use |
 
 Manifests are published for the projects above so the sources and their history are available.
@@ -78,9 +81,9 @@ may change without notice.
 
 ## Repository layout
 
-- `ebadge/`: eBadge manifests grouped by chip family
-- `dashboard/`: dashboard manifests grouped by chip family
 - `watch/`: watch manifests
+- `dashboard/`: dashboard manifests grouped by chip family
+- `ebadge/`: eBadge manifests grouped by chip family
 - `deskmate/`: deskmate manifests
 - `smarthome/`: smart-home manifests
 - `chargebox/`: charging-case manifests
@@ -95,9 +98,39 @@ Product directories use lowercase names. Every manifest has an explicit source s
 
 > When using these files, pass the matching relative path to `--mf`, for example `--mf demo/rtl8773g-claw-gerrit.yml`.
 
-## Production manifests
+## Watch
+
+### RTL8773GTP Watch 360360
+
+Smartwatch application for the RTL8773GTP, with a 360×360 display.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf watch/rtl8773gtp-watch-360360-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf watch/rtl8773gtp-watch-360360-gitee.yml .
+west update
+```
+
+**Build:**
+```bash
+py -3.13 -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r zephyrproject\zephyr\scripts\requirements-base.txt
+
+cmake -S applications -B applications\build-venv -G Ninja -DBOARD=rtl87x3g_evb -DPython3_EXECUTABLE="%CD%\.venv\Scripts\python.exe"
+cmake --build applications\build-venv --parallel 8
+```
 
 ---
+
+## Dashboard
 
 ### RTL8773E Dashboard
 
@@ -129,169 +162,6 @@ west update
 
 ---
 
-### RTL8773E eBadge
-
-Electronic badge application for the RTL8773E.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773e-ebadge-gerrit.yml .
-west update
-```
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773e-ebadge-gitee.yml .
-west update
-```
-
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8773e-ebadge-github.yml .
-west update
-```
-
-**Build:** Keil (MDK)
-
----
-
-### RTL8773G Deskmate
-
-Desktop companion device application for the RTL8773G.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf deskmate/rtl8773g-deskmate-gerrit.yml .
-west update
-```
-
-**Gitee / GitHub:** not open-sourced yet
-
-**Build:**
-```bash
-west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/deskmate
-```
-
----
-
-### RTL8773G eBadge
-
-Electronic badge application for the RTL8773G.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-ebadge-gerrit.yml .
-west update
-```
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-ebadge-gitee.yml .
-west update
-```
-
-**GitHub:** not open-sourced yet
-
-**Build:**
-```bash
-cd zephyrproject
-west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
-```
-
----
-
-### RTL8773G Watch
-
-Smartwatch application for the RTL8773G, with a round 360×360 display.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf watch/rtl8773gtp-watch-360360-gerrit.yml .
-west update
-```
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf watch/rtl8773gtp-watch-360360-gitee.yml .
-west update
-```
-
-**Build:**
-```bash
-py -3.13 -m venv .venv
-.venv\Scripts\activate.bat
-python -m pip install -r zephyrproject\zephyr\scripts\requirements-base.txt
-
-cmake -S applications -B applications\build-venv -G Ninja -DBOARD=rtl87x3g_evb -DPython3_EXECUTABLE="%CD%\.venv\Scripts\python.exe"
-cmake --build applications\build-venv --parallel 8
-```
-
----
-
-### RTL8773G + RTL8711F eBadge
-
-Electronic badge application combining the RTL8773G and the RTL8711F for the wireless link.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gerrit.yml .
-west update
-```
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gitee.yml .
-west update
-```
-
-**GitHub:** not open-sourced yet
-
-**Build:**
-```bash
-cd zephyrproject
-west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g_8711f
-```
-
----
-
-### RTL8773G Smarthome
-
-Smart-home control panel application for the RTL8773G.
-
-
-**Internal Gerrit:** no standalone internal manifest is currently provided.
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf smarthome/rtl8773g-smarthome-gitee.yml .
-west update
-```
-
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf smarthome/rtl8773g-smarthome-github.yml .
-west update
-```
-
-**Build:**
-```bash
-west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/smarthome
-```
-
----
-
 ### RTL8773G Dashboard
 
 HMI dashboard application for the RTL8773G.
@@ -315,66 +185,6 @@ west update
 **Build:**
 ```bash
 west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/dashboard
-```
-
----
-
-### RTL8773G Chargebox
-
-Charging-case application for the RTL8773G.
-
-**Internal Gerrit:** no standalone internal manifest is currently provided.
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf chargebox/rtl8773g-chargebox-gitee.yml .
-west update
-```
-
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf chargebox/rtl8773g-chargebox-github.yml .
-west update
-```
-
-**Build:**
-```bash
-west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/chargebox
-```
-
----
-
-### RTL8783GBF eBadge
-
-Electronic badge application for the RTL8783GBF.
-
-**Internal Gerrit:**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8783gbf-ebadge-gerrit.yml .
-west update
-```
-
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8783gbf-ebadge-gitee.yml .
-west update
-```
-
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8783gbf-ebadge-github.yml .
-west update
-```
-
-**Build:**
-```bash
-cd zephyrproject
-west build -b rtl87x3g_evb realtek-app/applications/eBadge
 ```
 
 ---
@@ -420,6 +230,203 @@ env.bat
 ameba.py SOC RTL8721F
 ameba.py menuconfig
 ameba.py build
+```
+
+---
+
+## eBadge
+
+### RTL8773E eBadge
+
+Electronic badge application for the RTL8773E.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773e-ebadge-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773e-ebadge-gitee.yml .
+west update
+```
+
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8773e-ebadge-github.yml .
+west update
+```
+
+**Build:** Keil (MDK)
+
+---
+
+### RTL8773G eBadge
+
+Electronic badge application for the RTL8773G.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-ebadge-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-ebadge-gitee.yml .
+west update
+```
+
+**GitHub:** not open-sourced yet
+
+**Build:**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g
+```
+
+---
+
+### RTL8773G + RTL8711F eBadge
+
+Electronic badge application combining the RTL8773G and the RTL8711F for the wireless link.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8773g-rtl8711f-ebadge-gitee.yml .
+west update
+```
+
+**GitHub:** not open-sourced yet
+
+**Build:**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_evb realtek-app/applications/eBadge_8773g_8711f
+```
+
+---
+
+### RTL8783GBF eBadge
+
+Electronic badge application for the RTL8783GBF.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf ebadge/rtl8783gbf-ebadge-gerrit.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf ebadge/rtl8783gbf-ebadge-gitee.yml .
+west update
+```
+
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf ebadge/rtl8783gbf-ebadge-github.yml .
+west update
+```
+
+**Build:**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_evb realtek-app/applications/eBadge
+```
+
+---
+
+## Other products
+
+### RTL8773G Deskmate
+
+Desktop companion device application for the RTL8773G.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf deskmate/rtl8773g-deskmate-gerrit.yml .
+west update
+```
+
+**Gitee / GitHub:** not open-sourced yet
+
+**Build:**
+```bash
+west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/deskmate
+```
+
+---
+
+### RTL8773G Smarthome
+
+Smart-home control panel application for the RTL8773G.
+
+
+**Internal Gerrit:** no standalone internal manifest is currently provided.
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf smarthome/rtl8773g-smarthome-gitee.yml .
+west update
+```
+
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf smarthome/rtl8773g-smarthome-github.yml .
+west update
+```
+
+**Build:**
+```bash
+west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/smarthome
+```
+
+---
+
+### RTL8773G Chargebox
+
+Charging-case application for the RTL8773G.
+
+**Internal Gerrit:** no standalone internal manifest is currently provided.
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf chargebox/rtl8773g-chargebox-gitee.yml .
+west update
+```
+
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf chargebox/rtl8773g-chargebox-github.yml .
+west update
+```
+
+**Build:**
+```bash
+west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/chargebox
 ```
 
 ---
