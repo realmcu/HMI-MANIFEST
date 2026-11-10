@@ -42,6 +42,7 @@ Accordingly, every open-sourced project provides up to three manifests:
 - [Automated-test manifests (`autotest/`)](#automated-test-manifests-autotest)
   - [RTL8783GBF EVB HoneyGUI](#rtl8783gbf-evb-honeygui)
 - [Test manifests (`test/`)](#test-manifests-test)
+  - [RTL8773G HMI integrated](#rtl8773g-hmi-integrated)
   - [RTL8783GBF EVB WH](#rtl8783gbf-evb-wh)
   - [RTL8773GTP eBadge WH](#rtl8773gtp-ebadge-wh)
   - [RTL87X3G Mijia](#rtl87x3g-mijia)
@@ -63,9 +64,9 @@ beforehand. If you have not set one up, use the HTTPS address of the same reposi
 | Project | Maturity |
 | --- | --- |
 | RTL8773E Dashboard | Released |
-| RTL8773G Smarthome | Released |
 | RTL8773G Dashboard | Released |
 | RTL8773G Chargebox | Released |
+| RTL8773G Smarthome | In development |
 | RTL8773G + RTL8711F eBadge | In development |
 | RTL8721F Dashboard | In development |
 | RTL8762D LVGL HMI | In development |
@@ -425,6 +426,7 @@ west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/deskmate
 
 Smart-home control panel application for the RTL8773G.
 
+> ⚠️ In development. Not yet ready for production use.
 
 **Internal Gerrit:** no standalone internal manifest is currently provided.
 
@@ -616,6 +618,29 @@ Adjust the Linux port `/dev/ttyUSB0` or the Windows COM port `COM3` to match you
 ## Test manifests (`test/`)
 
 > ⚠️ The manifests in this directory are for internal development and testing only (personal branches, EVB bring-up, and so on). They may be unstable and are meant only for the developers concerned.
+
+---
+
+### RTL8773G HMI integrated
+
+Single workspace carrying the shared HMI SDK repositories plus the Smarthome,
+Dashboard and Chargebox applications, for building several targets in one tree.
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl8773g-hmi-gerrit.yml .
+west update
+```
+
+**Build:** from the target's directory, with board `rtl87x3g_sample` for
+`samples/*` and `rtl87x3g_evb` for `applications/*`.
+
+```bash
+west build -b <board>
+```
+
+The Dashboard's `ui_design/` comes from GitHub, not the internal Gerrit.
 
 ---
 
