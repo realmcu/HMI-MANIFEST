@@ -28,7 +28,7 @@ manifest:
 
       - name: hal_realtek
         repo-path: HoneyRepo/zephyr-hal
-        revision: b0ee865b621b07b476457c96d4aa65092912f7e8
+        revision: fb34f76a88a179fc006551ea474c2b3f534300df
         path: zephyrproject/modules/hal/realtek
 
       - name: realtek-app
