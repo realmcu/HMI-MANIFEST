@@ -1,6 +1,8 @@
 manifest:
 
     remotes:
+      - name: github
+        url-base: https://github.com
       - name: gitee
         url-base: ssh://git@gitee.com
 
@@ -8,10 +10,21 @@ manifest:
       remote: gitee
 
     projects:
-      - name: rtl87x3g-hmi-sdk
-        repo-path: realmcu/rtl87x3g-hmi-sdk
-        revision: master
-        path: zephyrproject
+      - name: rtl87x3g-watch-sdk
+        remote: github
+        repo-path: rtkconnectivity/rtl87x3g-zsdk
+        revision: watch/v1.14.3.2
+        path: zephyrproject/realtek-app
+        import:
+            file: west.yml
+            path-prefix: .
+            name-allowlist:
+              - cmsis
+              - fatfs
+              - hal_realtek
+              - mbedtls
+              - tinycrypt
+              - zephyr
 
       - name: display
         repo-path: realmcu/display

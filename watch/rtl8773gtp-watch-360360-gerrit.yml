@@ -3,8 +3,6 @@ manifest:
     remotes:
       - name: origin
         url-base: ssh://cn4soc.rtkbf.com:29418
-      - name: gitee-ssh
-        url-base: ssh://git@gitee.com
       - name: gitee
         url-base: ssh://git@gitee.com
 
@@ -17,7 +15,7 @@ manifest:
       # HoneyGUI master; HoneyGUI itself intentionally tracks master.
       - name: zephyr
         repo-path: HoneyRepo/zephyr
-        revision: 22ae46e7450b8ea4c46bb063e2e0b86caa43fd78
+        revision: realtek-main-v3.7
         path: zephyr
         import:
             file: test.yml
@@ -74,7 +72,7 @@ manifest:
         path: FlashDB
 
       - name: gsensor-algorithm
-        remote: gitee-ssh
+        remote: gitee
         repo-path: realmcu_admin/gsensor-algorithm
         revision: master
         path: gsensor-algorithm
