@@ -104,6 +104,10 @@ Product directories use lowercase names. Every manifest has an explicit source s
 
 Smartwatch application for the RTL8773GTP, with a 360×360 display.
 
+The Gerrit manifest follows the internal SDK baseline and uses the
+`realtek-main-v3.7` Zephyr branch. The Gitee and GitHub manifests use the public
+`rtkconnectivity/rtl87x3g-zsdk` release tag `watch/v1.14.3.2`.
+
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
@@ -118,8 +122,49 @@ west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf watch/rtl87
 west update
 ```
 
-**Build:**
+**GitHub (public):**
 ```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf watch/rtl8773gtp-watch-360360-github.yml .
+west update
+```
+
+**Gitee/GitHub SDK release assets:**
+
+The public watch SDK keeps `bin/` and `tools/` in GitHub Releases. After `west
+update`, fetch and verify them before building:
+
+```bash
+python3 zephyrproject/realtek-app/fetch_assets.py
+```
+
+**Build prerequisites:**
+
+The watch UI repository does not track Designer-generated sources. Generate the
+UI before building so these directories are populated:
+
+- `ui/src/generated/`
+- `ui/src/ui/`
+- `ui/src/callbacks/`
+
+The Gitee manifest contains `gsensor-algorithm`. The current GitHub manifest
+does not include it because no public GitHub mirror is available, so that
+dependency must be provided separately before building the HMI application.
+
+**Build (Linux/macOS):**
+
+```bash
+export ZEPHYR_SDK_INSTALL_DIR=<zephyr-sdk-path>
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+applications/scripts/build.sh -p
+```
+
+The Gerrit workspace has been verified with Zephyr SDK 0.16.8. The generated
+firmware is written to `applications/bin/`.
+
+**Build (Windows/CMake):**
+
+```bat
 py -3.13 -m venv .venv
 .venv\Scripts\activate.bat
 python -m pip install -r zephyrproject\zephyr\scripts\requirements-base.txt
