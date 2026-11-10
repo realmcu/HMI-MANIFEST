@@ -8,10 +8,20 @@ manifest:
       remote: github
 
     projects:
-      - name: rtl87x3g-hmi-sdk
-        repo-path: realmcu/rtl87x3g-hmi-sdk
-        revision: master
-        path: zephyrproject
+      - name: rtl87x3g-common-sdk
+        repo-path: rtkconnectivity/rtl87x3g-zsdk
+        revision: common/v1.0.0.21
+        path: zephyrproject/realtek-app
+        import:
+            file: west.yml
+            path-prefix: .
+            name-allowlist:
+              - cmsis
+              - fatfs
+              - hal_realtek
+              - mbedtls
+              - tinycrypt
+              - zephyr
 
       - name: display
         repo-path: realmcu/display
@@ -25,7 +35,7 @@ manifest:
 
       - name: lvgl
         repo-path: realmcu/lvgl
-        revision: lvgl_v9
+        revision: 6ba2451d3c10e445d525fdf0a57a4dcf193300ae
         path: zephyrproject/modules/lvgl
 
       - name: hmi

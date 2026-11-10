@@ -1,6 +1,8 @@
 manifest:
 
     remotes:
+      - name: github
+        url-base: https://github.com
       - name: gitee
         url-base: ssh://git@gitee.com
 
@@ -9,40 +11,50 @@ manifest:
       remote: gitee
 
     projects:
-      - name: zephyr-sdk
-        remote: gitee 
-        repo-path: realmcu/rtl87x3g-hmi-sdk
-        revision: master
-        path: zephyrproject
+      - name: rtl87x3g-common-sdk
+        remote: github
+        repo-path: rtkconnectivity/rtl87x3g-zsdk
+        revision: common/v1.0.0.21
+        path: zephyrproject/realtek-app
+        import:
+            file: west.yml
+            path-prefix: .
+            name-allowlist:
+              - cmsis
+              - fatfs
+              - hal_realtek
+              - mbedtls
+              - tinycrypt
+              - zephyr
     
 
       - name: honeygui
         remote: gitee
         repo-path: realmcu/HoneyGUI
-        revision: master
+        revision: ebe9378874810fd86c239f1def9488878257be6f
         path: zephyrproject/modules/honeygui
         
       - name: display
         repo-path: realmcu/display
-        revision: master
+        revision: 82c8e046412a226d825815ea1e687912a7b387e1
         path: zephyrproject/modules/display
 
       - name: hmi
         repo-path: realmcu/hmi
-        revision: rtl8773g-eBadge
+        revision: 63db83f21346a3a350cd334ee3ce0f4d13899246
         path: zephyrproject/realtek-app/applications/eBadge_8773g
         west-commands: west_commands_extention/west-commands.yml
 
       - name: ui
         remote: gitee                         
         repo-path: realmcu/honeygui-template-EBadge 
-        revision: master                         
+        revision: 3c95e400a8d5a6a61340cf715517d0d65b24e373
         path: zephyrproject/realtek-app/applications/eBadge_8773g/app/designer
 
       - name: rtl87x3-hmi-protocol
         remote: gitee
         repo-path: realmcu/hmi
-        revision: rtl87x3-hmi-protocol
+        revision: 605897370eb2874eea5ee0c5b40b5fe5f7eb150d
         path: zephyrproject/realtek-app/applications/eBadge_8773g/component/protocol
 
 

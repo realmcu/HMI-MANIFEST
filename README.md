@@ -670,15 +670,6 @@ west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf test/rtl
 west update
 ```
 
-**Gitee (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf test/rtl8773gtp-ebadge-wh-gitee.yml .
-west update
-```
-
-**GitHub:** not provided for this test manifest.
-
 **Build:** (this manifest checks the app out to `applications/` at the workspace root, not under `zephyrproject/`)
 ```bash
 cd applications
