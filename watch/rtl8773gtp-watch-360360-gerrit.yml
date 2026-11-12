@@ -11,8 +11,8 @@ manifest:
 
     projects:
       # SDK versions are based on the bb2u-sdk-hmi-v0.0.0.1 release manifest.
-      # Display carries the accelerator API updates required by floating
-      # HoneyGUI master; HoneyGUI itself intentionally tracks master.
+      # Display carries the accelerator API updates required by HoneyGUI
+      # master, so both are kept on their floating master branches.
       - name: zephyr
         repo-path: HoneyRepo/zephyr
         revision: realtek-main-v3.7
@@ -38,7 +38,7 @@ manifest:
 
       - name: display
         repo-path: HoneyRepo/driver/display
-        revision: 3b42a79b50ecdee6729d58551da1d33c31c182ff
+        revision: master
         path: zephyrproject/modules/display
 
       - name: honeygui
