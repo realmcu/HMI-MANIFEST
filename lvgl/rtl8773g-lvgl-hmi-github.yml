@@ -1,0 +1,79 @@
+manifest:
+ 
+    remotes:
+      - name: github
+        url-base: https://github.com
+      - name: gitee
+        url-base: ssh://git@gitee.com
+ 
+    defaults:
+      remote: github
+ 
+    projects:
+      - name: rtl87x3g-watch-sdk
+        repo-path: rtkconnectivity/rtl87x3g-zsdk
+        revision: watch/v1.14.3.2
+        path: zephyrproject/realtek-app
+        import:
+            file: west.yml
+            path-prefix: .
+            name-allowlist:
+              - cmsis
+              - fatfs
+              - hal_realtek
+              - mbedtls
+              - tinycrypt
+              - zephyr
+ 
+      - name: zephyr
+        repo-path: rtkconnectivity/rtl87x3g-zephyr
+        revision: aed0a36ed1e1a16eef143576716d1cd1e124310f
+        path: zephyrproject/zephyr
+        west-commands: scripts/west-commands.yml
+
+      - name: hal_realtek
+        repo-path: rtkconnectivity/hal_realtek
+        revision: ddf0184c883283586fcca8b2c791fb8d6fea1bd4
+        path: zephyrproject/modules/hal/realtek
+
+      - name: display
+        repo-path: rtkconnectivity/display
+        revision: 44361a88076dd08c72687e2fea6d17d3843526c1
+        path: zephyrproject/modules/display
+        
+
+      - name: lvgl    
+        repo-path: realmcu/lvgl
+        revision: 491c579e0dafb49917100d45510e0d741a89d116
+        path: zephyrproject/modules/lvgl
+
+ 
+      - name: hmi-script
+        repo-path: realmcu/hmi
+        revision: script
+        path: zephyrproject/realtek-app/applications/scripts
+ 
+
+      - name: honeygui
+        repo-path: realmcu/HoneyGUI
+        revision: ebe9378874810fd86c239f1def9488878257be6f
+        path: zephyrproject/modules/honeygui
+
+      - name: rtl87x3-hmi-posix
+        repo-path: realmcu/hmi
+        revision: posix-device
+        path: zephyrproject/modules/posix
+ 
+      - name: rtl87x3-hmi-protocol
+        repo-path: realmcu/hmi
+        revision: rtl87x3-hmi-protocol
+        path: zephyrproject/modules/protocol
+ 
+      - name: FlashDB
+        repo-path: realmcu/hmi
+        revision: FlashDB
+        path: zephyrproject/modules/FlashDB
+      
+
+    self:
+        path: .manifest
