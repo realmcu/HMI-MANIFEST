@@ -4,7 +4,7 @@ manifest:
       - name: github
         url-base: https://github.com
       - name: gitee
-        url-base: ssh://git@gitee.com
+        url-base: https://gitee.com
 
     defaults:
       remote: gitee
