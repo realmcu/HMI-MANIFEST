@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Promote a GitHub-verified lock package through the local Gerrit workflow.
 
-GitHub Actions builds the floating manifest and publishes a promotion package,
-but never writes git history. This script downloads and validates that package,
-then deliberately splits the local side into two commands:
+The HMI SDK CI (realmcu/HMI-SDK-CI) builds the floating manifest and publishes
+a promotion package, but never writes git history. This script downloads and
+validates that package, then deliberately splits the local side into two commands:
 
   prepare  download, validate, and update the current checkout's lock file
   submit   commit the reviewed lock and push it to Gerrit for review
@@ -32,9 +32,14 @@ import yaml
 
 from bump_lock import LockError, ensure_pinned, ensure_same_project_set, parse_projects
 
-DEFAULT_REPOSITORY = "realmcu/HMI-MANIFEST"
-DEFAULT_WORKFLOW = "nightly-verification.yml"
-ARTIFACT_PREFIX = "dashboard-lock-promotion-"
+DEFAULT_REPOSITORY = "realmcu/HMI-SDK-CI"
+DEFAULT_WORKFLOW = "hmi-ci.yml"
+CI_BRANCH = "main"
+# Pull requests (including forks) also run the CI workflow and can upload
+# artifacts with any name; only these events build trusted revisions.
+TRUSTED_EVENTS = {"schedule", "workflow_dispatch"}
+MANIFEST_REPOSITORY = "realmcu/HMI-MANIFEST"
+ARTIFACT_PREFIX = "lock-promotion-rtl8773e-dashboard-"
 LOCK_PATH = "dashboard/rtl8773e-dashboard-gitee.lock.yml"
 FLOATING_PATH = "dashboard/rtl8773e-dashboard-gitee.yml"
 LOCK_NAME = Path(LOCK_PATH).name
@@ -49,6 +54,8 @@ EXPECTED_METADATA_KEYS = {
     "run_id",
     "run_attempt",
     "run_url",
+    "ci_commit",
+    "manifest_repository",
     "manifest_commit",
     "source_manifest",
     "source_manifest_sha256",
@@ -71,7 +78,16 @@ class Artifact:
     expired: bool
     created_at: str
     head_branch: str
+    from_fork: bool
+
+
+@dataclass(frozen=True)
+class WorkflowRun:
+    event: str
+    path: str
+    head_branch: str
     head_sha: str
+    head_repository: str
 
 
 @dataclass(frozen=True)
@@ -168,7 +184,8 @@ def parse_artifacts(document: dict[str, Any]) -> list[Artifact]:
                 expired=bool(entry.get("expired", False)),
                 created_at=str(entry.get("created_at", "")),
                 head_branch=str(workflow_run.get("head_branch", "")),
-                head_sha=str(workflow_run.get("head_sha", "")),
+                from_fork=workflow_run.get("head_repository_id")
+                != workflow_run.get("repository_id"),
             )
         )
     return artifacts
@@ -206,11 +223,52 @@ def select_artifact(artifacts: Sequence[Artifact], run_id: int | None) -> Artifa
     if not candidates:
         requested = f" for run {run_id}" if run_id is not None else ""
         raise PromotionError(f"No unexpired lock promotion artifact found{requested}")
-    candidates = [artifact for artifact in candidates if artifact.head_branch == "master"]
+    candidates = [
+        artifact
+        for artifact in candidates
+        if artifact.head_branch == CI_BRANCH and not artifact.from_fork
+    ]
     if not candidates:
-        raise PromotionError("No lock promotion artifact from the master branch was found")
+        raise PromotionError(
+            f"No lock promotion artifact from the {CI_BRANCH} branch was found"
+        )
     # The API returns newest first, but sort explicitly instead of relying on it.
     return max(candidates, key=lambda artifact: (artifact.created_at, artifact.run_id))
+
+
+def query_run(repository: str, run_id: int) -> WorkflowRun:
+    process = run(["gh", "api", f"repos/{repository}/actions/runs/{run_id}"])
+    try:
+        document = json.loads(process.stdout)
+    except json.JSONDecodeError as exc:
+        raise PromotionError(f"GitHub returned invalid run JSON: {exc}") from exc
+    if not isinstance(document, dict):
+        raise PromotionError("GitHub run response must be a JSON object")
+    head_repository = document.get("head_repository")
+    return WorkflowRun(
+        event=str(document.get("event", "")),
+        path=str(document.get("path", "")),
+        head_branch=str(document.get("head_branch", "")),
+        head_sha=str(document.get("head_sha", "")),
+        head_repository=str(
+            head_repository.get("full_name", "") if isinstance(head_repository, dict) else ""
+        ),
+    )
+
+
+def verify_run(workflow_run: WorkflowRun, *, repository: str, workflow: str) -> None:
+    """Reject packages from runs that did not build trusted CI code."""
+    checks = (
+        ("event", workflow_run.event, sorted(TRUSTED_EVENTS)),
+        ("workflow", workflow_run.path, [f".github/workflows/{workflow}"]),
+        ("branch", workflow_run.head_branch, [CI_BRANCH]),
+        ("repository", workflow_run.head_repository, [repository]),
+    )
+    for key, actual, allowed in checks:
+        if actual not in allowed:
+            raise PromotionError(
+                f"The CI run's {key} is {actual!r}, expected {' or '.join(allowed)}"
+            )
 
 
 def download_artifact(repository: str, artifact: Artifact, destination: Path) -> None:
@@ -236,7 +294,6 @@ def validate_package(
     repository: str,
     workflow: str,
     expected_run_id: int | None,
-    expected_manifest_commit: str | None,
     floating_path: Path,
 ) -> PromotionPackage:
     lock_path = directory / LOCK_NAME
@@ -263,9 +320,10 @@ def validate_package(
         raise PromotionError("Unexpected promotion metadata schema; " + "; ".join(details))
 
     checks = {
-        "schema_version": 1,
+        "schema_version": 2,
         "repository": repository,
         "workflow_file": workflow,
+        "manifest_repository": MANIFEST_REPOSITORY,
         "source_manifest": FLOATING_NAME,
         "lock_file": LOCK_NAME,
         "track": "floating",
@@ -287,14 +345,10 @@ def validate_package(
     if metadata.get("run_url") != f"https://github.com/{repository}/actions/runs/{run_id}":
         raise PromotionError("Promotion metadata run_url does not match repository and run_id")
 
-    manifest_commit = metadata.get("manifest_commit")
-    if not isinstance(manifest_commit, str) or not FULL_SHA.match(manifest_commit):
-        raise PromotionError("Promotion metadata manifest_commit is not a full commit SHA")
-    if expected_manifest_commit and manifest_commit != expected_manifest_commit:
-        raise PromotionError(
-            "Promotion metadata manifest_commit does not match the selected "
-            "GitHub Actions run"
-        )
+    for key in ("ci_commit", "manifest_commit"):
+        value = metadata.get(key)
+        if not isinstance(value, str) or not FULL_SHA.match(value):
+            raise PromotionError(f"Promotion metadata {key} is not a full commit SHA")
 
     expected_source_hash = metadata.get("source_manifest_sha256")
     packaged_source_hash = sha256(packaged_floating)
@@ -332,9 +386,9 @@ def validate_package(
 
 
 def verify_manifest_commit(manifest_repo: Path, commit: str) -> None:
-    # The package is downloaded from GitHub using gh, then independently bound
-    # to a commit reachable from the expected public mirror branch.
-    git(manifest_repo, "fetch", "github", "master")
+    # The CI repository is not the manifest repository, so the metadata alone
+    # cannot prove which manifest was built; bind it to reviewed history.
+    # Requires gerrit/master to be fetched.
     result = run(
         [
             "git",
@@ -343,13 +397,13 @@ def verify_manifest_commit(manifest_repo: Path, commit: str) -> None:
             "merge-base",
             "--is-ancestor",
             commit,
-            "github/master",
+            "gerrit/master",
         ],
         check=False,
     )
     if result.returncode != 0:
         raise PromotionError(
-            f"CI manifest commit {commit} is not reachable from github/master"
+            f"CI manifest commit {commit} is not reachable from gerrit/master"
         )
 
 
@@ -492,10 +546,10 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
     expected_run_id: int | None = args.run_id
     lock_written = False
     try:
+        require_command("gh")
         if args.package:
             package_dir = args.package.expanduser().resolve()
         else:
-            require_command("gh")
             artifact = select_artifact(query_artifacts(args.repository), args.run_id)
             expected_run_id = artifact.run_id
             temporary = tempfile.TemporaryDirectory(prefix="lock-promotion-")
@@ -508,7 +562,6 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
             repository=args.repository,
             workflow=args.workflow,
             expected_run_id=expected_run_id,
-            expected_manifest_commit=(artifact.head_sha if not args.package else None),
             floating_path=floating_path,
         )
         run_id = int(package.metadata["run_id"])
@@ -518,11 +571,19 @@ def prepare(args: argparse.Namespace, manifest_repo: Path) -> int:
             print(f"Lock already contains GitHub run {run_id}; nothing to promote.")
             return 0
 
+        # Ask GitHub about the run itself: the package contents, including the
+        # metadata, are whatever the uploading job wrote.
+        workflow_run = query_run(args.repository, run_id)
+        verify_run(workflow_run, repository=args.repository, workflow=args.workflow)
+        if workflow_run.head_sha != package.metadata["ci_commit"]:
+            raise PromotionError(
+                "Promotion metadata ci_commit does not match the CI run's commit"
+            )
+        git(manifest_repo, "fetch", "gerrit", "master")
         verify_manifest_commit(
             manifest_repo,
             str(package.metadata["manifest_commit"]),
         )
-        git(manifest_repo, "fetch", "gerrit", "master")
         if git(manifest_repo, "rev-parse", "HEAD") != git(
             manifest_repo, "rev-parse", "gerrit/master"
         ):
@@ -568,8 +629,8 @@ def commit_message(state: dict[str, Any]) -> tuple[str, str]:
     subject = "manifest: promote dashboard lock"
     body = (
         "Promote the RTL8773E Dashboard lock to revisions verified by the\n"
-        "GitHub nightly full build.\n\n"
-        f"GitHub run: {state['run_id']}\n"
+        "HMI SDK CI full build.\n\n"
+        f"CI run: {state['run_url']}\n"
         f"Manifest: {state['manifest_commit']}"
     )
     if len(subject) > 50 or any(len(line) > 72 for line in body.splitlines()):
