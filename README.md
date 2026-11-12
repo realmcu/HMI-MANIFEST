@@ -5,8 +5,8 @@ This repository is the single place where the West manifest files for all platfo
 The repository is hosted in three locations, kept in sync:
 
 - Internal Gerrit: `ssh://cn4soc.rtkbf.com:29418/hmi/manifest`
-- Gitee (public): `git@gitee.com:realmcu/hmi-manifest.git`
-- GitHub (public): `git@github.com:realmcu/HMI-MANIFEST.git`
+- Gitee (public): `https://gitee.com/realmcu/hmi-manifest.git`
+- GitHub (public): `https://github.com/realmcu/HMI-MANIFEST.git`
 
 Accordingly, every open-sourced project provides up to three manifests:
 
@@ -56,8 +56,10 @@ Accordingly, every open-sourced project provides up to three manifests:
 | `python3` | ≥ 3.8 | `python3 --version` |
 | `west` | ≥ 1.2 | `west --version` |
 
-The commands below clone over SSH, so an SSH key must be registered with your hosting service
-beforehand. If you have not set one up, use the HTTPS address of the same repository instead.
+The public manifests (`-gitee.yml` and `-github.yml`) fetch over HTTPS and need no account, access
+token or SSH key — anyone can clone them. Only the internal Gerrit manifests (`-gerrit.yml`) use SSH
+and require a key registered on the Gerrit server. If a public manifest still lists
+`ssh://git@gitee.com`, either register a key or replace the base with `https://gitee.com`.
 
 ## Project maturity
 
@@ -193,14 +195,14 @@ west update
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773e-dashboard-gitee.yml .
+west init -m https://gitee.com/realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773e-dashboard-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773e-dashboard-github.yml .
+west init -m https://github.com/realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773e-dashboard-github.yml .
 west update
 ```
 
@@ -217,14 +219,14 @@ HMI dashboard application for the RTL8773G.
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773g-dashboard-gitee.yml .
+west init -m https://gitee.com/realmcu/hmi-manifest.git --mr master --mf dashboard/rtl8773g-dashboard-gitee.yml .
 west update
 ```
 
 **GitHub (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773g-dashboard-github.yml .
+west init -m https://github.com/realmcu/HMI-MANIFEST.git --mr master --mf dashboard/rtl8773g-dashboard-github.yml .
 west update
 ```
 
