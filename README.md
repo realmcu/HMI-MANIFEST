@@ -232,7 +232,9 @@ west update
 
 **Build:**
 ```bash
-west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/dashboard
+python3 zephyrproject/realtek-app/fetch_assets.py
+cd zephyrproject/realtek-app/applications/dashboard
+west build -b rtl87x3g_evb
 ```
 
 ---
@@ -475,7 +477,9 @@ west update
 
 **Build:**
 ```bash
-west build -b rtl87x3g_evb zephyrproject/realtek-app/applications/chargebox
+python3 zephyrproject/realtek-app/fetch_assets.py
+cd zephyrproject/realtek-app/applications/chargebox
+west build -b rtl87x3g_evb
 ```
 
 ---
