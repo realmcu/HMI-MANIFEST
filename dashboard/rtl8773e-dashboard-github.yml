@@ -10,33 +10,33 @@ manifest:
     projects:
       - name: rtl87x3ep-hmi-sdk
         repo-path: realmcu/rtl87x3ep-hmi-sdk
-        revision: master
+        revision: 9f2a1130fde318c6df7d8d629579ab7de020d0e1
         path: sdk
 
       - name: hmi-dashboard
         repo-path: realmcu/hmi
-        revision: rtl8773e-dashboard
+        revision: b949ba392e700536b96dc2b92d9ad2714ebee2c8
         path: sdk/board/evb/hmi_dashboard
         west-commands: west_commands_extention/west-commands.yml
 
       - name: wearable
         repo-path: realmcu/wearable
-        revision: master
+        revision: 0f95348d5f3f6ef95525eea22361e196e85a1a49
         path: sdk/src/app/Wearable
 
       - name: HoneyGUI
         repo-path: realmcu/HoneyGUI
-        revision: master
+        revision: 68010fc52d6c74dde464306245f2d160983ba8ee
         path: sdk/src/sample/gui
 
       - name: display
         repo-path: realmcu/display
-        revision: master
+        revision: 42dd49699c3c9680f7b64d4253747ad2edfc2c87
         path: sdk/src/mcu/display
 
       - name: ui
         repo-path: realmcu/honeygui-template-dashboard
-        revision: dev_lite
+        revision: 2e82d6a6c9f7afa94c1ba528f23a96c4f12538d9
         path: sdk/board/evb/hmi_dashboard/src/application/designer
 
     self:
