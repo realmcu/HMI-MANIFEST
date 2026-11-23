@@ -52,6 +52,7 @@ manifest:
       - name: hmi-script
         repo-path: HoneyRepo/hmi
         revision: script
+        clone-depth: 1
         path: applications/scripts
 
       - name: rtl87x3-hmi-posix
