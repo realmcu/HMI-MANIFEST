@@ -25,6 +25,7 @@ manifest:
       - name: honeygui
         repo-path: realmcu/HoneyGUI
         revision: master
+        clone-depth: 1
         path: zephyrproject/modules/honeygui
 
       - name: display
