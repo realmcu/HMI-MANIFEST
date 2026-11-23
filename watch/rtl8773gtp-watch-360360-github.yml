@@ -19,10 +19,7 @@ manifest:
             path-prefix: .
             name-allowlist:
               - cmsis
-              - fatfs
               - hal_realtek
-              - mbedtls
-              - tinycrypt
               - zephyr
 
       - name: honeygui

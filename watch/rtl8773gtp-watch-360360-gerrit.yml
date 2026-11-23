@@ -22,9 +22,6 @@ manifest:
             path-prefix: zephyrproject
             name-allowlist:
               - cmsis
-              - tinycrypt
-              - mbedtls
-              - fatfs
 
       - name: hal_realtek
         repo-path: HoneyRepo/zephyr-hal
