@@ -28,9 +28,13 @@ manifest:
         revision: fb34f76a88a179fc006551ea474c2b3f534300df
         path: zephyrproject/modules/hal/realtek
 
+      # Merged rebase of Gerrit change 363438 (patchset 8), the commit that
+      # actually landed on master. Do not pin to a patchset SHA such as
+      # refs/changes/38/363438/7: west only fetches branches and tags, so an
+      # unmerged or rebased-away patchset is unreachable and update fails.
       - name: realtek-app
         repo-path: HoneyRepo/realtek-zephyr-project
-        revision: 021abd84621423591eb59644e2198e5890df6c83
+        revision: 9d8248a02f504e0cdf6f75d950c06172e25df75f
         path: zephyrproject/realtek-app
 
       - name: display
