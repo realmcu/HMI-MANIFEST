@@ -3,8 +3,6 @@ manifest:
     remotes:
       - name: github
         url-base: https://github.com
-      - name: gitee
-        url-base: ssh://git@gitee.com
  
     defaults:
       remote: github
