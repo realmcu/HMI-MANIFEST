@@ -35,6 +35,7 @@ Accordingly, every open-sourced project provides up to three manifests:
   - [RTL8773G Smarthome](#rtl8773g-smarthome)
   - [RTL8773G Chargebox](#rtl8773g-chargebox)
   - [RTL8762D LVGL HMI](#rtl8762d-lvgl-hmi)
+  - [RTL8773G LVGL HMI](#rtl8773g-lvgl-hmi)
 - [Demo manifests (`demo/`)](#demo-manifests-demo)
   - [RTL8773G CLAW](#rtl8773g-claw)
   - [RTL8783G z2plus](#rtl8783g-z2plus)
@@ -512,6 +513,23 @@ west update
 **GitHub:** not open-sourced yet
 
 **Build:** open `sdk/board/evb_stack_img/lvgl/mdk/project.uvprojx` in Keil and build.
+
+---
+
+### RTL8773G LVGL HMI
+
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m https://github.com/realmcu/HMI-MANIFEST.git --mr master --mf lvgl/rtl8773g-lvgl-hmi-github.yml .
+west update
+```
+
+**Build:**
+```bash
+cd zephyrproject
+west build -b rtl87x3g_sample samples/lvgl -p
+```
 
 ---
 
