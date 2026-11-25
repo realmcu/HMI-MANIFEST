@@ -547,7 +547,7 @@ An RTL87X2G HMI project built on LVGL v9 (480 × 480 RGB panel, 280 × 456 QSPI 
 | Display driver | `HoneyRepo/driver/display` (`master`) → `beeSDK/subsys/display` | `realmcu/display` (`master`) → `sdk/subsys/display` |
 | HMI application | `HoneyRepo/hmi` (`rtl87x2g-lvgl-hmi`) → `beeSDK/applications/lvgl` | `realmcu/hmi` (`rtl87x2g-lvgl-hmi`) → `sdk/applications/lvgl` |
 
-The Gitee and GitHub manifests lay the workspace out in the same way; only the remote host differs.
+The Gitee manifest lays the workspace out in the same way as the internal one; only the remote host differs.
 
 **Internal Gerrit:**
 ```bash
@@ -563,12 +563,7 @@ west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf lvgl/rtl87x
 west update
 ```
 
-**GitHub (public):**
-```bash
-mkdir <workspace> && cd <workspace>
-west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf lvgl/rtl87x2g-lvgl-hmi-github.yml .
-west update
-```
+**GitHub:** not open-sourced yet
 
 **Build:** open `sdk/applications/lvgl/proj/mdk/project.uvprojx` in Keil and build.
 
