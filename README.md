@@ -36,6 +36,7 @@ Accordingly, every open-sourced project provides up to three manifests:
   - [RTL8773G Chargebox](#rtl8773g-chargebox)
   - [RTL8762D LVGL HMI](#rtl8762d-lvgl-hmi)
   - [RTL8773G LVGL HMI](#rtl8773g-lvgl-hmi)
+  - [RTL87X2G LVGL HMI](#rtl87x2g-lvgl-hmi)
 - [Demo manifests (`demo/`)](#demo-manifests-demo)
   - [RTL8773G CLAW](#rtl8773g-claw)
   - [RTL8783G z2plus](#rtl8783g-z2plus)
@@ -530,6 +531,37 @@ west update
 cd zephyrproject
 west build -b rtl87x3g_sample samples/lvgl -p
 ```
+
+---
+
+### RTL87X2G LVGL HMI
+
+An RTL87X2G HMI project built on LVGL v9 (480 × 480 RGB panel, 280 × 456 QSPI optional), made up of the following components:
+
+| Component | Internal Gerrit | Gitee |
+| --- | --- | --- |
+| SDK | `HoneyRepo/sdk` (`bee4-sdk-v1.7.0`) → `beeSDK/` | `realmcu/rtl87x2g-hmi-sdk` (`master`) → `sdk/` |
+| Wearable | `Wearable` (`master`) → `beeSDK/subsys/wearable` | `realmcu/wearable` (`master`) → `sdk/subsys/wearable` |
+| LVGL | `HoneyRepo/lvgl` (`lvgl_v9`) → `beeSDK/subsys/lvgl` | `realmcu/lvgl` (`lvgl_v9`) → `sdk/subsys/lvgl` |
+| HMI application | `HoneyRepo/hmi` (`rtl87x2g-lvgl-hmi`) → `beeSDK/applications/lvgl` | `realmcu/hmi` (`rtl87x2g-lvgl-hmi`) → `sdk/applications/lvgl` |
+
+**Internal Gerrit:**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl87x2g-lvgl-hmi.yml .
+west update
+```
+
+**Gitee (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl87x2g-lvgl-hmi-gitee.yml .
+west update
+```
+
+**GitHub:** not open-sourced yet
+
+**Build:** open `sdk/applications/lvgl/proj/mdk/project.uvprojx` in Keil and build.
 
 ---
 

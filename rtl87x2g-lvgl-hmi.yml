@@ -1,0 +1,42 @@
+manifest:
+
+    remotes:
+      - name: origin
+        url-base: ssh://cn4soc.rtkbf.com:29418
+
+    defaults:
+        remote: origin
+
+    projects:
+      - name: sdk
+        repo-path: HoneyRepo/sdk
+        revision: bee4-sdk-v1.7.0
+        path: beeSDK
+
+      - name: lvgl
+        repo-path: HoneyRepo/lvgl
+        revision: lvgl_v9
+        path: beeSDK/subsys/lvgl
+
+      - name: Wearable
+        repo-path: Wearable
+        revision: master
+        path: beeSDK/subsys/wearable
+
+      - name: iodriver
+        repo-path: HoneyRepo/driver
+        revision: driver-bee-sdk
+        path: beeSDK/bsp/driver
+
+      - name: display
+        repo-path: HoneyRepo/driver/display
+        revision: master
+        path: beeSDK/subsys/display
+
+      - name: hmi
+        repo-path: HoneyRepo/hmi
+        revision: rtl87x2g-lvgl-hmi
+        path: beeSDK/applications/lvgl
+
+    self:
+        path: .manifest
