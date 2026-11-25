@@ -5,13 +5,18 @@ manifest:
         url-base: https://gitee.com
 
     defaults:
-        remote: origin
+      remote: origin
 
     projects:
       - name: rtl87x2g-hmi-sdk
         repo-path: realmcu/rtl87x2g-hmi-sdk
         revision: master
         path: sdk
+
+      - name: wearable
+        repo-path: realmcu/wearable
+        revision: master
+        path: sdk/subsys/wearable
 
       - name: lvgl
         repo-path: realmcu/lvgl
@@ -22,11 +27,6 @@ manifest:
         repo-path: realmcu/display
         revision: master
         path: sdk/subsys/display
-
-      - name: wearable
-        repo-path: realmcu/wearable
-        revision: master
-        path: sdk/subsys/wearable
 
       - name: hmi
         repo-path: realmcu/hmi

@@ -543,23 +543,32 @@ An RTL87X2G HMI project built on LVGL v9 (480 × 480 RGB panel, 280 × 456 QSPI 
 | SDK | `HoneyRepo/sdk` (`bee4-sdk-v1.7.0`) → `beeSDK/` | `realmcu/rtl87x2g-hmi-sdk` (`master`) → `sdk/` |
 | Wearable | `Wearable` (`master`) → `beeSDK/subsys/wearable` | `realmcu/wearable` (`master`) → `sdk/subsys/wearable` |
 | LVGL | `HoneyRepo/lvgl` (`lvgl_v9`) → `beeSDK/subsys/lvgl` | `realmcu/lvgl` (`lvgl_v9`) → `sdk/subsys/lvgl` |
+| I/O driver | `HoneyRepo/driver` (`driver-bee-sdk`) → `beeSDK/bsp/driver` | — |
+| Display driver | `HoneyRepo/driver/display` (`master`) → `beeSDK/subsys/display` | `realmcu/display` (`master`) → `sdk/subsys/display` |
 | HMI application | `HoneyRepo/hmi` (`rtl87x2g-lvgl-hmi`) → `beeSDK/applications/lvgl` | `realmcu/hmi` (`rtl87x2g-lvgl-hmi`) → `sdk/applications/lvgl` |
+
+The Gitee and GitHub manifests lay the workspace out in the same way; only the remote host differs.
 
 **Internal Gerrit:**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf rtl87x2g-lvgl-hmi.yml .
+west init -m ssh://cn4soc.rtkbf.com:29418/hmi/manifest --mr master --mf lvgl/rtl87x2g-lvgl-hmi-gerrit.yml .
 west update
 ```
 
 **Gitee (public):**
 ```bash
 mkdir <workspace> && cd <workspace>
-west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf rtl87x2g-lvgl-hmi-gitee.yml .
+west init -m git@gitee.com:realmcu/hmi-manifest.git --mr master --mf lvgl/rtl87x2g-lvgl-hmi-gitee.yml .
 west update
 ```
 
-**GitHub:** not open-sourced yet
+**GitHub (public):**
+```bash
+mkdir <workspace> && cd <workspace>
+west init -m git@github.com:realmcu/HMI-MANIFEST.git --mr master --mf lvgl/rtl87x2g-lvgl-hmi-github.yml .
+west update
+```
 
 **Build:** open `sdk/applications/lvgl/proj/mdk/project.uvprojx` in Keil and build.
 
