@@ -161,7 +161,7 @@ dependency must be provided separately before building the HMI application.
 ```bash
 export ZEPHYR_SDK_INSTALL_DIR=<zephyr-sdk-path>
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-applications/scripts/build.sh -p
+scripts/build.sh -p
 ```
 
 The Gerrit workspace has been verified with Zephyr SDK 0.16.8. The generated
