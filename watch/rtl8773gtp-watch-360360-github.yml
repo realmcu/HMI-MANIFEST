@@ -42,7 +42,7 @@ manifest:
         repo-path: realmcu/hmi
         revision: script
         clone-depth: 1
-        path: applications/scripts
+        path: scripts
 
       - name: rtl87x3-hmi-posix
         repo-path: realmcu/hmi
