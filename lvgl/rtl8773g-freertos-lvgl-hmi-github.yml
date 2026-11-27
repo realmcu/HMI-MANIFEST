@@ -1,0 +1,19 @@
+manifest:
+  remotes:
+  - name: rtkconnectivity
+    url-base: https://github.com/rtkconnectivity
+  - name: realmcu
+    url-base: https://github.com/realmcu
+  defaults:
+    remote: rtkconnectivity
+  projects:
+  - name: rtl87x3g-fsdk
+    revision: v3.14.0.13
+    path: rtl87x3g-fsdk
+  - name: hmi-script
+    remote: realmcu
+    repo-path: hmi
+    revision: script
+    path: rtl87x3g-fsdk/tool/scripts
+  self:
+    path: rtl87x3g-fsdk-manifest
